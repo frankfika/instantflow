@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "instantflow",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-08-01",
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "ROOMS", "class_name": "RoomObject" },
+      { "name": "CODES", "class_name": "CodeObject" },
+      { "name": "LIMITERS", "class_name": "RateLimiterObject" }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "RoomObject",
+        "CodeObject",
+        "RateLimiterObject"
+      ]
+    }
+  ],
+  "vars": { "ENVIRONMENT": "production" },
+  "observability": { "enabled": true, "head_sampling_rate": 1 }
+}
