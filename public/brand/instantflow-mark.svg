@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">InstantFlow mark</title>
+  <desc id="desc">Two dark surfaces exchanging an electric cyan data pulse.</desc>
+  <path fill="#071725" d="M7 7 28 14v8h-6v4h8v5h-7v5h5v6h-7v8L7 57V7Z"/>
+  <path fill="#071725" d="m57 9-20 6v7h5v5h-8v5h7v5h-5v6h7v7l14 6V9Z"/>
+  <g fill="#00E5E8">
+    <path d="M25 19h13v3H25z"/>
+    <path d="M29 24h8v2h-8z"/>
+    <path d="M21 28h17v4H21z"/>
+    <path d="M27 34h14v3H27z"/>
+    <path d="M23 39h11v3H23z"/>
+    <path d="M29 44h10v3H29z"/>
+  </g>
+</svg>

@@ -70,7 +70,7 @@ function Shell({ children, eyebrow = "瞬传 / INSTANTFLOW" }) {
       <header className="topbar">
         <a className="brand" href="/">
           <span className="brand-mark">
-            <LockKeyhole size={16} />
+            <img src="/brand/instantflow-mark.svg" alt="" />
           </span>
           <span>{eyebrow}</span>
         </a>
