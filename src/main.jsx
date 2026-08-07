@@ -15,7 +15,6 @@ import {
   QrCode,
   RotateCcw,
   ShieldCheck,
-  Sparkles,
   Trash2,
   Upload,
   Wifi,
@@ -62,7 +61,7 @@ function App() {
   return <UnifiedHome />;
 }
 
-function Shell({ children, eyebrow = "瞬传 / INSTANTFLOW" }) {
+function Shell({ children, eyebrow = "INSTANTFLOW" }) {
   return (
     <div className="app-shell">
       <div className="ambient ambient-a" />
@@ -81,9 +80,9 @@ function Shell({ children, eyebrow = "瞬传 / INSTANTFLOW" }) {
       </header>
       {children}
       <footer className="footer">
-        <span>不需要账号，不保留传输历史</span>
+        <span>无账号 · 无历史 · 端到端加密</span>
         <span className="footer-link">
-          <ShieldCheck size={13} /> 设计上默认最少保存
+          <ShieldCheck size={13} /> 临时传输，阅后即焚
         </span>
       </footer>
     </div>
@@ -134,8 +133,13 @@ function UnifiedHome() {
   const inputRef = useRef(null);
   const verificationResolverRef = useRef(null);
   const hasContent = kind === "file" ? file : text.trim();
+  const normalizedPassphraseLength = normalizePassphrase(passphrase).length;
+  const passphraseMissingCharacters = Math.max(
+    0,
+    8 - normalizedPassphraseLength,
+  );
   const canSend =
-    hasContent && (!usePassphrase || normalizePassphrase(passphrase).length >= 8);
+    hasContent && (!usePassphrase || normalizedPassphraseLength >= 8);
   const choose = (f) => {
     if (!f) return;
     if (f.size > 20 * 1024 * 1024)
@@ -237,28 +241,15 @@ function UnifiedHome() {
     <Shell>
       <main className="main home-main">
         <section className="hero">
-          <div className="eyebrow">
-            <Sparkles size={14} /> SHORT-LIVED / PRIVATE BY DEFAULT
-          </div>
           <h1>
-            {mode === "send" ? (
-              <>
-                把信息送到
-                <br />
-                <em>另一台设备。</em>
-              </>
-            ) : (
-              <>
-                接收一份
-                <br />
-                <em>临时信息。</em>
-              </>
-            )}
+            {mode === "send"
+              ? "把信息送到另一台设备"
+              : "接收一份临时信息"}
           </h1>
           <p>
             {mode === "send"
               ? "不登录，不复制链接。选择内容后，用一次性配对码连接另一台设备。"
-              : "输入发送设备上显示的配对码，内容只会在这台设备本地解密。"}
+              : "输入发送设备上显示的配对码，内容只在这台设备本地解密。"}
           </p>
         </section>
         <div className="mode-switch home-mode">
@@ -392,14 +383,37 @@ function UnifiedHome() {
                 </span>
               </label>
               {usePassphrase && (
-                <input
-                  className="passphrase-input"
-                  type="password"
-                  value={passphrase}
-                  onChange={(event) => setPassphrase(event.target.value.slice(0, 64))}
-                  placeholder="设置至少 8 个字符的接收口令"
-                  autoComplete="new-password"
-                />
+                <div className="passphrase-field">
+                  <input
+                    className="passphrase-input"
+                    type="password"
+                    value={passphrase}
+                    onChange={(event) => {
+                      setPassphrase(event.target.value.slice(0, 64));
+                      setError("");
+                    }}
+                    placeholder="设置至少 8 个字符的接收口令"
+                    autoComplete="new-password"
+                    aria-invalid={
+                      passphrase.length > 0 && passphraseMissingCharacters > 0
+                    }
+                    aria-describedby="passphrase-requirement"
+                  />
+                  <small
+                    id="passphrase-requirement"
+                    className={
+                      passphrase.length > 0 && passphraseMissingCharacters > 0
+                        ? "field-hint invalid"
+                        : "field-hint"
+                    }
+                  >
+                    {passphrase.length === 0
+                      ? "至少 8 个字符"
+                      : passphraseMissingCharacters > 0
+                        ? `还差 ${passphraseMissingCharacters} 个字符，暂时不能生成配对码`
+                        : "口令长度符合要求"}
+                  </small>
+                </div>
               )}
               {sameNetworkOnly && (
                 <p className="network-caveat">
@@ -427,7 +441,10 @@ function UnifiedHome() {
                 </>
               ) : (
                 <>
-                  生成一次性配对码 <ArrowUpRight size={17} />
+                  {usePassphrase && passphraseMissingCharacters > 0
+                    ? `接收口令还差 ${passphraseMissingCharacters} 个字符`
+                    : "生成一次性配对码"}
+                  <ArrowUpRight size={17} />
                 </>
               )}
             </button>
@@ -454,7 +471,7 @@ function UnifiedHome() {
         </button>
         <section id="how" className="how-section">
           <div>
-            <span className="section-kicker">A SMALL PROMISE</span>
+            <span className="section-kicker">HOW IT WORKS</span>
             <h2>
               让安全变成
               <br />
