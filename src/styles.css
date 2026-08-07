@@ -127,6 +127,45 @@ button {
   align-items: center;
 }
 
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.gh-star-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.gh-star-btn:hover {
+  border-color: var(--blue);
+  box-shadow: 0 2px 12px rgba(79, 124, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.gh-star-count {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(79, 124, 255, 0.08);
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .status-dot,
 .live-dot {
   width: 7px;
@@ -204,6 +243,28 @@ h1 em {
   line-height: 1.65;
   color: var(--muted);
   font-size: 15px;
+}
+
+.open-source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue);
+  background: rgba(79, 124, 255, 0.08);
+  border: 1px solid rgba(79, 124, 255, 0.2);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.open-source-badge:hover {
+  background: rgba(79, 124, 255, 0.14);
+  border-color: var(--blue);
+  transform: translateY(-1px);
 }
 
 /* ---- Mode Switch ---- */
@@ -1377,6 +1438,22 @@ h1 em {
   align-items: center;
 }
 
+.footer-links {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.footer-gh {
+  color: var(--blue);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.footer-gh:hover {
+  opacity: 0.7;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 800px) {
   .topbar {
@@ -1451,6 +1528,15 @@ h1 em {
     padding-right: 18px;
     gap: 10px;
     flex-direction: column;
+  }
+  .footer-links {
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .gh-star-btn {
+    padding: 5px 12px;
+    font-size: 12px;
   }
   .ready-main {
     padding-top: 24px;
