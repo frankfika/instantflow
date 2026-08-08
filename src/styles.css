@@ -293,91 +293,8 @@ h1 em {
   color: var(--blue);
 }
 
-.hero p {
-  max-width: 480px;
-  margin: 0 auto;
-  line-height: 1.55;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-/* ---- Hero Star CTA ---- */
-.hero-star-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-  padding: 7px 13px 7px 7px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink);
-  background: linear-gradient(135deg, #fff 0%, #f4f7ff 100%);
-  border: 1px solid rgba(79, 124, 255, 0.28);
-  box-shadow: 0 4px 18px rgba(79, 124, 255, 0.14);
-  text-decoration: none;
-  transition: all 0.25s ease;
-  position: relative;
-}
-
-.hero-star-cta:hover {
-  transform: translateY(-2px);
-  border-color: var(--blue);
-  box-shadow: 0 8px 26px rgba(79, 124, 255, 0.22);
-}
-
-.hero-star-ic {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: #fff;
-  flex: 0 0 auto;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
-}
-
 .hero-star-pulse {
   animation: starPulse 2.4s ease-in-out infinite;
-}
-
-.hero-star-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  text-align: left;
-  line-height: 1.2;
-}
-
-.hero-star-body b {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.hero-star-body small {
-  font-size: 10.5px;
-  color: var(--muted);
-  font-weight: 500;
-}
-
-.hero-star-go {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px 11px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--blue) 0%, var(--indigo) 100%);
-  color: #fff;
-  font-size: 11.5px;
-  font-weight: 700;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.hero-star-cta:hover .hero-star-go {
-  box-shadow: 0 2px 10px rgba(79, 124, 255, 0.4);
 }
 
 /* ---- Mode Switch ---- */
@@ -577,14 +494,6 @@ h1 em {
   font-size: 13px;
   outline: none;
   cursor: pointer;
-}
-
-.option-note {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--muted);
-  font-size: 11px;
 }
 
 /* ---- Security Options ---- */
@@ -847,45 +756,6 @@ h1 em {
   cursor: not-allowed;
 }
 
-/* ---- Trust Strip ---- */
-.trust-strip {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-}
-
-.trust-strip > div {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  color: var(--muted);
-}
-
-.trust-strip > div svg {
-  color: var(--blue);
-}
-
-.trust-strip b,
-.trust-strip small {
-  display: block;
-}
-
-.trust-strip b {
-  font-size: 12px;
-  color: var(--ink);
-  margin-bottom: 2px;
-  font-weight: 600;
-}
-
-.trust-strip small {
-  font-size: 11px;
-  color: var(--muted);
-  line-height: 1.35;
-}
-
 /* ---- How Link (legacy, replaced by .how-toggle) ---- */
 
 /* ---- How Section Accordion Toggle ---- */
@@ -1084,27 +954,13 @@ h1 em {
   text-align: center;
 }
 
-.receive-entry .receive-lock {
-  margin: 0 auto 16px;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-}
-
 .receive-entry h2 {
   font-size: clamp(28px, 3vw, 36px);
   line-height: 1.1;
   letter-spacing: -0.04em;
-  margin: 16px 0 12px;
+  margin: 0 0 20px;
   font-weight: 700;
   color: var(--ink);
-}
-
-.receive-entry p {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
-  margin: 0 0 20px;
 }
 
 .code-input {
@@ -1411,7 +1267,6 @@ h1 em {
   box-shadow: var(--shadow);
 }
 
-.receive-lock,
 .done-icon,
 .status-card-icon {
   width: 56px;
@@ -1453,18 +1308,6 @@ h1 em {
   display: flex;
   align-items: center;
   gap: 5px;
-}
-
-.receive-warning {
-  margin-top: 16px;
-  color: var(--muted);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 5px;
-  text-align: left;
-  line-height: 1.5;
-  font-size: 11px;
 }
 
 .status-card {
@@ -1681,10 +1524,6 @@ h1 em {
     font-size: clamp(24px, 6.5vw, 30px);
     margin: 0 0 6px;
   }
-  .hero p {
-    font-size: 13px;
-    margin: 0;
-  }
   .send-card,
   .receive-entry {
     width: 100%;
@@ -1762,34 +1601,10 @@ h1 em {
   .receive-done h1 {
     font-size: 32px;
   }
-  .trust-strip {
-    gap: 8px;
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .trust-strip > div {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 4px;
-  }
-  .trust-strip > div svg {
-    flex: 0 0 auto;
-  }
-  .trust-strip small {
-    font-size: 10px;
-    display: none;
-  }
-  .trust-strip b {
-    font-size: 11px;
-    margin-bottom: 0;
-  }
   .send-options {
     align-items: flex-start;
     gap: 8px;
     flex-direction: column;
-  }
-  .option-note {
-    align-self: flex-end;
   }
   .ready-actions {
     gap: 8px;
@@ -1819,25 +1634,6 @@ h1 em {
   .hero h1 {
     font-size: clamp(24px, 2.6vw, 30px);
     margin: 0 0 6px;
-  }
-  .hero p {
-    font-size: 13px;
-    line-height: 1.5;
-    margin: 0 auto;
-  }
-  .hero-star-cta {
-    margin-top: 10px;
-    padding: 6px 12px 6px 6px;
-  }
-  .hero-star-ic {
-    width: 26px;
-    height: 26px;
-  }
-  .hero-star-body b {
-    font-size: 12px;
-  }
-  .hero-star-body small {
-    font-size: 10px;
   }
   .home-main > .send-card,
   .home-main > .receive-entry {
@@ -1885,21 +1681,6 @@ h1 em {
     padding-block: 11px;
     font-size: 13.5px;
   }
-  .trust-strip {
-    margin-top: 12px;
-    padding-top: 10px;
-    gap: 10px;
-  }
-  .trust-strip > div {
-    align-items: center;
-  }
-  .trust-strip b {
-    margin-bottom: 0;
-    font-size: 11.5px;
-  }
-  .trust-strip small {
-    display: none;
-  }
   .how-section {
     margin-top: 36px;
     padding-top: 24px;
@@ -1917,12 +1698,6 @@ h1 em {
   }
   .hero h1 {
     font-size: clamp(22px, 2.4vw, 26px);
-  }
-  .hero p {
-    font-size: 12.5px;
-  }
-  .hero-star-cta {
-    margin-top: 6px;
   }
   .home-main > .send-card,
   .home-main > .receive-entry {
@@ -1942,10 +1717,6 @@ h1 em {
   }
   .primary-btn {
     padding-block: 10px;
-  }
-  .trust-strip {
-    margin-top: 8px;
-    padding-top: 8px;
   }
   /* how-section 在极短屏上变成折叠卡片，由 JS 控制展开 */
   .how-section {

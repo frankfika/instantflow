@@ -5,7 +5,6 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
-  Clock3,
   Download,
   FileLock2,
   FileText,
@@ -137,6 +136,7 @@ function GitHubStarButton() {
       }
       title={hasStars ? t("star.title.hasStars", { count: starLabel }) : t("star.title.firstStar")}
     >
+      <GithubIcon size={15} />
       <Star size={14} className="gh-star-pulse" />
       <span>{hasStars ? t("star.btn.hasStars") : t("star.btn.firstStar")}</span>
       {hasStars && (
@@ -144,36 +144,6 @@ function GitHubStarButton() {
           <Star size={11} /> {starLabel}
         </span>
       )}
-    </a>
-  );
-}
-
-function HeroStarCta() {
-  const { t } = useLang();
-  const stars = useStarCount();
-  const hasStars = stars != null && stars > 0;
-  return (
-    <a
-      className="hero-star-cta"
-      href={REPO_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={t("star.aria.firstStar")}
-    >
-      <span className="hero-star-ic">
-        <Star size={14} className="hero-star-pulse" />
-      </span>
-      <span className="hero-star-body">
-        <b>{hasStars ? t("star.hero.title.hasStars") : t("star.hero.title.firstStar")}</b>
-        <small>
-          {hasStars
-            ? t("star.hero.sub.hasStars", { count: stars.toLocaleString() })
-            : t("star.hero.sub.firstStar")}
-        </small>
-      </span>
-      <span className="hero-star-go">
-        <GithubIcon size={13} /> {t("star.hero.cta")}
-      </span>
     </a>
   );
 }
@@ -231,39 +201,10 @@ function Shell({ children }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Star size={13} className="footer-star" /> {t("star.footer")}
+            <GithubIcon size={13} /> <Star size={13} className="footer-star" /> {t("star.footer")}
           </a>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function TrustStrip() {
-  const { t } = useLang();
-  return (
-    <div className="trust-strip">
-      <div>
-        <LockKeyhole size={15} />
-        <span>
-          <b>{t("trust.encrypt.title")}</b>
-          <small>{t("trust.encrypt.sub")}</small>
-        </span>
-      </div>
-      <div>
-        <Clock3 size={15} />
-        <span>
-          <b>{t("trust.ttl.title")}</b>
-          <small>{t("trust.ttl.sub")}</small>
-        </span>
-      </div>
-      <div>
-        <ShieldCheck size={15} />
-        <span>
-          <b>{t("trust.account.title")}</b>
-          <small>{t("trust.account.sub")}</small>
-        </span>
-      </div>
     </div>
   );
 }
@@ -412,10 +353,6 @@ function UnifiedHome() {
           <h1>
             {mode === "send" ? t("hero.h1.send") : t("hero.h1.receive")}
           </h1>
-          <p>
-            {mode === "send" ? t("hero.p.send") : t("hero.p.receive")}
-          </p>
-          <HeroStarCta />
         </section>
         <div className="mode-switch home-mode">
           <button
@@ -509,9 +446,6 @@ function UnifiedHome() {
                   <option value={10}>{t("opt.after10")}</option>
                 </select>
               </label>
-              <span className="option-note">
-                <ShieldCheck size={14} /> {t("opt.note")}
-              </span>
             </div>
             <div className="security-options">
               <div className="security-options-heading">
@@ -619,7 +553,6 @@ function UnifiedHome() {
                 {error}
               </div>
             )}
-            <TrustStrip />
           </section>
         ) : (
           <ReceiveEntry />
@@ -825,14 +758,9 @@ function ReceiveEntry() {
     );
   return (
     <div className="receive-entry">
-      <div className="receive-lock">
-        <QrCode size={24} />
-      </div>
-      <span className="ready-eyebrow">{t("recv.eyebrow")}</span>
       <h2>
         <Multiline text={t("recv.h2")} />
       </h2>
-      <p>{t("recv.p")}</p>
       <input
         className="code-input"
         value={code}
@@ -883,10 +811,6 @@ function ReceiveEntry() {
           {error}
         </div>
       )}
-      <small className="receive-warning">
-        <ShieldCheck size={13} />{" "}
-        {t("recv.warn")}
-      </small>
     </div>
   );
 }

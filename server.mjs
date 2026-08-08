@@ -29,10 +29,14 @@ const tokenMatches = (value, digest) => {
     crypto.timingSafeEqual(candidate, digest)
   );
 };
+const ipv4Subnet24 = (ip) => {
+  const parts = ip.split(".");
+  return `v4:${parts[0]}.${parts[1]}.${parts[2]}`;
+};
 const ipv6Prefix64 = (address) => {
   let value = address.toLowerCase().split("%")[0];
   if (value.startsWith("::ffff:") && /^\d+\.\d+\.\d+\.\d+$/.test(value.slice(7)))
-    return `v4:${value.slice(7)}`;
+    return ipv4Subnet24(value.slice(7));
   const halves = value.split("::");
   if (halves.length > 2) return null;
   const left = halves[0] ? halves[0].split(":") : [];
@@ -49,7 +53,7 @@ const ipv6Prefix64 = (address) => {
 };
 const networkIdentity = (address) => {
   const value = String(address || "unknown").replace(/^\[|\]$/g, "");
-  if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(value)) return `v4:${value}`;
+  if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(value)) return ipv4Subnet24(value);
   return ipv6Prefix64(value) || `other:${value}`;
 };
 const parsePublicKey = (key) => {

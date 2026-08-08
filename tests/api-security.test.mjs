@@ -299,6 +299,85 @@ test("optional network and passphrase restrictions are enforced before pairing",
   }
 });
 
+test("same-network restriction matches IPv4 /24 subnet for two devices on same LAN", async () => {
+  const restrictedPort = 8794;
+  const restrictedBase = `http://127.0.0.1:${restrictedPort}`;
+  const restrictedServer = spawn(process.execPath, ["server.mjs"], {
+    cwd: process.cwd(),
+    env: {
+      ...process.env,
+      PORT: String(restrictedPort),
+      NODE_ENV: "test",
+      TRUST_PROXY: "true",
+    },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  try {
+    await waitForHealth(restrictedBase);
+
+    // Room created from 192.168.1.10
+    const created = await fetch(`${restrictedBase}/api/rooms`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "192.168.1.10",
+      },
+      body: JSON.stringify({
+        minutes: 5,
+        senderPublicKey: await publicKey(),
+        sameNetworkOnly: true,
+      }),
+    });
+    assert.equal(created.status, 201);
+    const room = await created.json();
+
+    // Different device on same /24 subnet (192.168.1.20) → allowed
+    const receiverPublicKey = await publicKey();
+    const sameSubnet = await fetch(
+      `${restrictedBase}/api/rooms/${room.roomId}/join`,
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-forwarded-for": "192.168.1.20",
+        },
+        body: JSON.stringify({ receiverPublicKey }),
+      },
+    );
+    assert.equal(sameSubnet.status, 200);
+
+    // Second room from 192.168.1.10, join from different /24 (192.168.2.50) → rejected
+    const created2 = await fetch(`${restrictedBase}/api/rooms`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "192.168.1.10",
+      },
+      body: JSON.stringify({
+        minutes: 5,
+        senderPublicKey: await publicKey(),
+        sameNetworkOnly: true,
+      }),
+    });
+    const room2 = await created2.json();
+    const otherSubnet = await fetch(
+      `${restrictedBase}/api/rooms/${room2.roomId}/join`,
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-forwarded-for": "192.168.2.50",
+        },
+        body: JSON.stringify({ receiverPublicKey: await publicKey() }),
+      },
+    );
+    assert.equal(otherSubnet.status, 403);
+    assert.equal((await otherSubnet.json()).error, "restricted_network");
+  } finally {
+    restrictedServer.kill("SIGTERM");
+  }
+});
+
 test("pair-code guessing is rate limited", async () => {
   const statuses = [];
   for (let i = 0; i < 12; i += 1) {
