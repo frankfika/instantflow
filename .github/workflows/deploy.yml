@@ -1,0 +1,144 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+
+concurrency:
+  group: deploy-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || 'prod' }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  deployments: write
+  pull-requests: write
+
+jobs:
+  # ── Pre-flight: run CI checks ─────────────────────────────────
+  pre-flight:
+    name: Pre-flight Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm test
+      - name: Type-check Worker
+        run: npm run typecheck:worker
+      - name: Dry-run deploy validation
+        run: npm run deploy:dry-run
+      - name: Check deployment trigger
+        id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ contains(github.event.label.name, 'deploy:preview') }}" == "true" ]]; then
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ── Production deployment ─────────────────────────────────────
+  deploy-production:
+    name: Deploy to Production
+    needs: pre-flight
+    if: github.event_name == 'push' && needs.pre-flight.outputs.should_deploy == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production
+      url: https://usend.xyz/
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+      - name: Build frontend
+        run: npm run build
+      - name: Deploy to Cloudflare Workers
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Run edge smoke test against production
+        run: npm run test:edge
+        env:
+          EDGE_URL: https://usend.xyz/
+      - name: Create deployment marker
+        run: |
+          echo "::notice::Deployed ${{ github.sha }} to https://usend.xyz/"
+
+  # ── PR preview deployment ─────────────────────────────────────
+  deploy-preview:
+    name: Deploy Preview (PR)
+    needs: pre-flight
+    if: github.event_name == 'pull_request' && needs.pre-flight.outputs.should_deploy == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: preview
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+      - name: Build frontend
+        run: npm run build
+      - name: Deploy preview Worker
+        id: preview
+        run: |
+          PREVIEW_NAME="instantflow-pr-${{ github.event.number }}"
+          npx wrangler deploy --name "$PREVIEW_NAME" 2>&1 | tee deploy.log
+          PREVIEW_URL=$(grep -oP 'https://[a-z0-9.-]+\.workers\.dev' deploy.log | head -1 || echo "")
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Comment preview URL on PR
+        if: steps.preview.outputs.preview_url != ''
+        uses: actions/github-script@ed3f425d82fcfb2b3f5f975dfade75a3f9a2c5e0 # v8.0.0
+        with:
+          script: |
+            const url = '${{ steps.preview.outputs.preview_url }}';
+            const body = `**Preview deployment:** ${url}`;
+            const issue_number = context.issue.number;
+            const { data: comments } = await github.rest.issues.listComments({
+              ...context.repo,
+              issue_number,
+            });
+            const existing = comments.find(c => c.body.startsWith('**Preview deployment:**'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                ...context.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number,
+                body,
+              });
+            }

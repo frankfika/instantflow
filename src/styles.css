@@ -245,13 +245,13 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 16px;
-  gap: 14px;
+  padding-top: 12px;
+  gap: 10px;
 }
 
 /* ---- Hero ---- */
 .hero {
-  padding-top: 4px;
+  padding-top: 2px;
   text-align: center;
 }
 
@@ -306,8 +306,8 @@ h1 em {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-top: 14px;
-  padding: 8px 14px 8px 8px;
+  margin-top: 10px;
+  padding: 7px 13px 7px 7px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
@@ -391,7 +391,7 @@ h1 em {
 }
 
 .home-mode {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
 }
 
 .mode-switch button,
@@ -416,7 +416,7 @@ h1 em {
 /* ---- Send Card ---- */
 .home-main > .send-card,
 .home-main > .receive-entry {
-  margin-top: 14px;
+  margin-top: 10px;
   width: 100%;
   max-width: 660px;
 }
@@ -425,7 +425,7 @@ h1 em {
   background: var(--card-bg);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 22px;
+  padding: 18px 20px;
   box-shadow: var(--shadow);
 }
 
@@ -436,7 +436,7 @@ h1 em {
   background: rgba(79, 124, 255, 0.06);
   border: 1px solid var(--line);
   border-radius: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .segmented button {
@@ -557,7 +557,7 @@ h1 em {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 12px 2px 10px;
+  margin: 10px 2px 8px;
 }
 
 .send-options label {
@@ -591,8 +591,8 @@ h1 em {
 .security-options {
   display: grid;
   gap: 4px;
-  padding: 12px;
-  margin: 0 0 12px;
+  padding: 10px;
+  margin: 0 0 10px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: var(--blue-soft);
@@ -851,9 +851,9 @@ h1 em {
 .trust-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-top: 16px;
-  padding-top: 14px;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid var(--line);
 }
 
@@ -886,21 +886,77 @@ h1 em {
   line-height: 1.35;
 }
 
-/* ---- How Link ---- */
-.how-link {
-  margin-top: -8px;
-  border: 0;
-  background: transparent;
-  color: var(--blue);
-  font-size: 13px;
+/* ---- How Link (legacy, replaced by .how-toggle) ---- */
+
+/* ---- How Section Accordion Toggle ---- */
+.how-toggle {
   display: flex;
+  border: 1px solid var(--line);
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 12px 14px;
+  width: 100%;
+  max-width: 660px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
   align-items: center;
-  gap: 6px;
-  transition: color 0.2s ease;
+  justify-content: space-between;
+  gap: 8px;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s ease;
+  margin-top: 8px;
 }
 
-.how-link:hover {
-  color: var(--blue-deep);
+.how-toggle:hover {
+  border-color: var(--blue);
+}
+
+.how-toggle .how-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+
+.how-toggle .how-toggle-ic {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: var(--blue-soft);
+  color: var(--blue);
+  flex: 0 0 auto;
+}
+
+.how-toggle .how-toggle-sub {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.how-toggle .how-toggle-chev {
+  transition: transform 0.25s ease;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+
+/* 折叠状态下隐藏内容 */
+.how-section.is-collapsed .how-steps,
+.how-section.is-collapsed > div:not(.how-section-head) {
+  display: none;
+}
+
+.how-section.is-collapsed {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+  min-height: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 /* ---- How Section ---- */
@@ -909,8 +965,8 @@ h1 em {
   display: grid;
   grid-template-columns: 0.8fr 1.2fr;
   gap: 56px;
-  margin-top: 72px;
-  padding-top: 40px;
+  margin-top: 48px;
+  padding-top: 32px;
   border-top: 1px solid var(--line);
 }
 
@@ -1641,9 +1697,9 @@ h1 em {
   .send-card {
     padding: 20px;
   }
-  .how-link {
+  .how-toggle {
     order: 3;
-    margin-top: -4px;
+    margin-top: 4px;
   }
   .mode-switch,
   .home-mode {
@@ -1663,7 +1719,14 @@ h1 em {
   .how-section {
     order: 4;
     display: block;
-    margin-top: 56px;
+    margin-top: 8px;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .how-section:not(.is-collapsed) {
+    margin-top: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
   }
   .how-steps {
     margin-top: 28px;
@@ -1701,12 +1764,24 @@ h1 em {
   }
   .trust-strip {
     gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .trust-strip > div {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+  }
+  .trust-strip > div svg {
+    flex: 0 0 auto;
   }
   .trust-strip small {
     font-size: 10px;
+    display: none;
   }
   .trust-strip b {
     font-size: 11px;
+    margin-bottom: 0;
   }
   .send-options {
     align-items: flex-start;
@@ -1825,9 +1900,6 @@ h1 em {
   .trust-strip small {
     display: none;
   }
-  .how-link {
-    margin-top: -4px;
-  }
   .how-section {
     margin-top: 36px;
     padding-top: 24px;
@@ -1875,11 +1947,10 @@ h1 em {
     margin-top: 8px;
     padding-top: 8px;
   }
+  /* how-section 在极短屏上变成折叠卡片，由 JS 控制展开 */
   .how-section {
-    display: none;
-  }
-  .how-link {
-    display: none;
+    margin-top: 20px;
+    padding-top: 16px;
   }
 }
 

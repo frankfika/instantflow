@@ -297,6 +297,7 @@ function UnifiedHome() {
   const [stage, setStage] = useState("idle");
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [howOpen, setHowOpen] = useState(false);
   const inputRef = useRef(null);
   const verificationResolverRef = useRef(null);
   const hasContent = kind === "file" ? file : text.trim();
@@ -624,16 +625,29 @@ function UnifiedHome() {
           <ReceiveEntry />
         )}
         <button
-          className="how-link"
-          onClick={() =>
-            document
-              .getElementById("how")
-              ?.scrollIntoView({ behavior: "smooth" })
-          }
+          className="how-toggle"
+          aria-expanded={howOpen}
+          onClick={() => setHowOpen((v) => !v)}
         >
-          {t("how.link")} <ChevronDown size={15} />
+          <span className="how-toggle-left">
+            <span className="how-toggle-ic">
+              <ShieldCheck size={16} />
+            </span>
+            <span>
+              {t("how.link")}
+              <small className="how-toggle-sub">{t("how.kicker")}</small>
+            </span>
+          </span>
+          <ChevronDown
+            size={18}
+            className="how-toggle-chev"
+            style={{ transform: howOpen ? "rotate(180deg)" : "none" }}
+          />
         </button>
-        <section id="how" className="how-section">
+        <section
+          id="how"
+          className={`how-section ${howOpen ? "" : "is-collapsed"}`}
+        >
           <div>
             <span className="section-kicker">{t("how.kicker")}</span>
             <h2>

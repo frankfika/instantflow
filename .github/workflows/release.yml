@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+      - name: Build frontend
+        run: npm run build
+      - name: Type-check Worker
+        run: npm run typecheck:worker
+      - name: Run tests
+        run: npm test
+      - name: Dry-run deploy validation
+        run: npm run deploy:dry-run
+
+      # ── Archive dist for release ──────────────────────────────
+      - name: Archive dist
+        run: tar -czf dist-production.tar.gz -C dist .
+
+      # ── Generate release notes ────────────────────────────────
+      - name: Generate release notes
+        id: notes
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 "${{ github.ref_name }}^" 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            LOG=$(git log --pretty=format:"- %s (%h)" "$PREV_TAG"..${{ github.ref_name }} --no-merges)
+          else
+            LOG=$(git log --pretty=format:"- %s (%h)" --no-merges -20)
+          fi
+          {
+            echo "notes<<EOF"
+            echo "## Changes"
+            echo ""
+            echo "$LOG"
+            echo ""
+            echo "---"
+            echo "**Worker:** [instantflow](https://usend.xyz/)"
+            echo "**Tag:** ${{ github.ref_name }}"
+            echo ""
+            echo "### Verification"
+            echo "- [ ] Two-device text transfer succeeds"
+            echo "- [ ] Two-device file transfer succeeds"
+            echo "- [ ] Security codes match on both devices"
+            echo "- [ ] Wrong pairing code is rejected"
+            echo "- [ ] Completed transfer code cannot be reused"
+            echo "- [ ] Sender revocation blocks download"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # ── Create GitHub Release ─────────────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@a9e2bd1a735477a6fac506be85c4722af868d594 # v2.3.6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Release ${{ github.ref_name }}
+          body: ${{ steps.notes.outputs.notes }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: dist-production.tar.gz
