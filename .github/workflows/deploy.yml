@@ -105,7 +105,7 @@ jobs:
       - name: Deploy preview Worker
         id: preview
         run: |
-          PREVIEW_NAME="instantflow-pr-${{ github.event.number }}"
+          PREVIEW_NAME="usend-pr-${{ github.event.number }}"
           npx wrangler deploy --name "$PREVIEW_NAME" 2>&1 | tee deploy.log
           PREVIEW_URL=$(grep -oP 'https://[a-z0-9.-]+\.workers\.dev' deploy.log | head -1 || echo "")
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"

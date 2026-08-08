@@ -50,7 +50,7 @@ PR 会自动取消旧的运行以节省资源（`cancel-in-progress`）。
 3. 冒烟测试：对 `https://usend.xyz/` 执行 `npm run test:edge`，验证健康检查、房间创建、配对、上传、下载和删除全流程。
 
 **预览部署**（PR 添加 `deploy:preview` 标签）：
-1. 预检全部通过后，发布独立的 `instantflow-pr-{number}` Worker。
+1. 预检全部通过后，发布独立的 `usend-pr-{number}` Worker。
 2. 自动在 PR 评论中贴出预览 URL（幂等：更新已有评论而非重复创建）。
 
 ### 发布流程 (`release.yml`)
@@ -100,4 +100,4 @@ npm run check
 - 在 GitHub 启用 Dependabot、Secret scanning、Push protection、CodeQL 和私密漏洞报告；保护 `main` 分支并要求 CI 全部通过。
 - 不在日志、错误追踪或客服工单中记录配对码、房间 ID 和访问令牌。
 - 出现疑似前端篡改时立即回滚 Worker，暂停服务并轮换 Cloudflare 发布凭据。
-- 回滚：在 Cloudflare Dashboard → Workers → instantflow → Deployments 中选择历史版本 Rollback。CI 的 `dist` artifact 可用于手动回滚到任意 commit。
+- 回滚：在 Cloudflare Dashboard → Workers → `instantflow` → Deployments 中选择历史版本 Rollback。这里的 Worker 名称是现有基础设施标识，产品品牌为 USend。CI 的 `dist` artifact 可用于手动回滚到任意 commit。

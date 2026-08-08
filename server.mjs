@@ -436,5 +436,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () =>
-  console.log(`InstantFlow API listening on http://${HOST}:${PORT}`),
+  console.log(`USend API listening on http://${HOST}:${PORT}`),
 );

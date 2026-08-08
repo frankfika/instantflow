@@ -54,7 +54,7 @@ jobs:
             echo "$LOG"
             echo ""
             echo "---"
-            echo "**Worker:** [instantflow](https://usend.xyz/)"
+            echo "**Worker:** [USend](https://usend.xyz/)"
             echo "**Tag:** ${{ github.ref_name }}"
             echo ""
             echo "### Verification"
