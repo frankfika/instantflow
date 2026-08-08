@@ -1762,13 +1762,16 @@ h1 em {
     align-self: center;
   }
   .home-mode {
-    width: 100%;
+    width: min(100%, 660px);
     padding: 4px;
   }
   .home-mode button {
     flex: 1;
-    min-height: 42px;
+    min-height: 44px;
     font-size: 14px;
+  }
+  .segmented button {
+    min-height: 44px;
   }
   .how-section {
     order: 4;
@@ -1776,6 +1779,12 @@ h1 em {
     margin-top: 8px;
     padding-top: 0;
     border-top: 0;
+  }
+  .discovery-content {
+    order: 5;
+  }
+  .main {
+    overflow-anchor: none;
   }
   .how-section:not(.is-collapsed) {
     margin-top: 16px;
