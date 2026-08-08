@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { webcrypto } from "node:crypto";
 
-const base = process.env.EDGE_URL || "http://127.0.0.1:8793";
+const base = (process.env.EDGE_URL || "http://127.0.0.1:8793").replace(
+  /\/+$/,
+  "",
+);
 
 const key = async () => {
   const pair = await webcrypto.subtle.generateKey(
