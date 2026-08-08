@@ -254,8 +254,28 @@ button {
 
 /* ---- Hero ---- */
 .hero {
-  padding-top: 2px;
+  padding-top: 10px;
   text-align: center;
+}
+
+.hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero-subtitle {
+  max-width: 560px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
 }
 
 .eyebrow,
@@ -289,6 +309,17 @@ button {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 520px) {
+  .hero {
+    padding-top: 4px;
+  }
+
+  .hero-subtitle {
+    padding: 0 10px;
+    font-size: 13px;
+  }
 }
 
 h1 em {

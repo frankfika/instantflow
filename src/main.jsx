@@ -349,9 +349,15 @@ function UnifiedHome() {
     <Shell>
       <main className="main home-main">
         <section className="hero">
+          <span className="hero-kicker">
+            <span className="status-dot" /> {t("top.trust")}
+          </span>
           <h1>
             {mode === "send" ? t("hero.h1.send") : t("hero.h1.receive")}
           </h1>
+          <p className="hero-subtitle">
+            {mode === "send" ? t("hero.p.send") : t("hero.p.receive")}
+          </p>
         </section>
         <div className="mode-switch home-mode">
           <button

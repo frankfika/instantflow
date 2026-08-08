@@ -7,14 +7,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 export const LANGS = ["zh", "en"];
 const STORAGE_KEY = "instantflow:lang";
 
-// 推断初始语言：用户主动选择的语言 > 默认 zh
+// 推断初始语言：用户主动选择的语言 > 默认 en
 export function detectLang() {
-  if (typeof window === "undefined") return "zh";
+  if (typeof window === "undefined") return "en";
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === "zh" || saved === "en") return saved;
   } catch {}
-  return "zh";
+  return "en";
 }
 
 // 翻译字典。带 {name} {count} {n} 的字符串支持插值。
@@ -419,7 +419,7 @@ const DICT = {
 };
 
 const LangContext = createContext({
-  lang: "zh",
+  lang: "en",
   setLang: () => {},
   t: (k) => k,
 });
