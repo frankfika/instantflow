@@ -114,7 +114,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - name: Comment preview URL on PR
         if: steps.preview.outputs.preview_url != ''
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const url = '${{ steps.preview.outputs.preview_url }}';
