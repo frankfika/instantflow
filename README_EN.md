@@ -126,3 +126,11 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for production deployment and secret config
 ## 📦 Releases
 
 The current version is [v0.1.0](https://github.com/frankfika/instantflow/releases/tag/v0.1.0). See [GitHub Releases](https://github.com/frankfika/instantflow/releases) for release notes and future updates.
+
+## ☕ Support the project
+
+If InstantFlow has been useful to you, consider buying the author a coffee. Thank you for your support!
+
+<div align="center">
+  <img src="./docs/assets/wechat-pay.jpg" alt="WeChat Pay donation QR code" width="320" />
+</div>

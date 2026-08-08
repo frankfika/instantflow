@@ -126,3 +126,11 @@ npm run deploy:dry-run
 ## 📦 版本
 
 当前版本为 [v0.1.0](https://github.com/frankfika/instantflow/releases/tag/v0.1.0)，更新记录与发布说明请查看 [GitHub Releases](https://github.com/frankfika/instantflow/releases)。
+
+## ☕ 支持项目
+
+如果瞬传对你有帮助，欢迎请作者喝杯咖啡。感谢你的支持！
+
+<div align="center">
+  <img src="./docs/assets/wechat-pay.jpg" alt="微信支付打赏二维码" width="320" />
+</div>
