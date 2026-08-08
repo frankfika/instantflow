@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 // ============================================================
-// InstantFlow — minimal i18n (zh / en)
+// USend — minimal i18n (zh / en)
 // ============================================================
 
 export const LANGS = ["zh", "en"];
@@ -22,11 +22,12 @@ export function detectLang() {
 const DICT = {
   zh: {
     // ---- document / meta ----
-    "doc.title": "瞬传 · 安全传到另一台设备",
+    "doc.title": "USend · 安全传到另一台设备",
+    "doc.description": "USend 是一款无需注册的安全文件与文字传输工具。手机、电脑之间用一次性配对码传输，端到端加密，最长 10 分钟后自动清除。",
     "doc.lang": "zh-CN",
 
     // ---- topbar ----
-    "brand.eyebrow": "INSTANTFLOW",
+    "brand.eyebrow": "USEND",
     "top.trust": "端到端加密",
     "lang.label": "语言",
     "lang.switchTo": "切换到 English",
@@ -43,7 +44,7 @@ const DICT = {
     "star.hero.sub.hasStars": "已有 {count} 颗星 · 完全开源，无追踪",
     "star.hero.sub.firstStar": "完全开源，无追踪，无账号 · 等你点亮第一颗星",
     "star.hero.cta": "去点 Star",
-    "star.ended.cta": "顺手给个 Star，让瞬传被更多人看到",
+    "star.ended.cta": "顺手给个 Star，让 USend 被更多人看到",
     "star.footer": "开源无追踪 · Star 支持一下",
 
     // ---- footer ----
@@ -132,6 +133,27 @@ const DICT = {
     "how.3.title": "自动清除",
     "how.3.body": "接收完成或时间到期后，临时数据会被删除。",
 
+    // ---- discovery content ----
+    "discover.kicker": "WHY USEND",
+    "discover.title": "不想登录、不想建群时，\nUSend 刚刚好。",
+    "discover.intro": "把文件或一段文字临时送到另一台设备。没有账号、没有公开链接，传输结束后临时数据会被清除。",
+    "discover.card1.title": "手机传到电脑",
+    "discover.card1.body": "打开 USend，在手机上选择文件，在电脑输入一次性配对码即可接收。",
+    "discover.card2.title": "临时发送文件",
+    "discover.card2.body": "发送合同、截图、附件或压缩包，不必上传到网盘，也不必给对方开长期权限。",
+    "discover.card3.title": "传文字和链接",
+    "discover.card3.body": "把地址、验证码以外的临时文字从一台设备带到另一台设备，复制即可。",
+    "discover.faq.title": "常见问题",
+    "discover.faq1.q": "USend 需要注册账号吗？",
+    "discover.faq1.a": "不需要。发送方和接收方都不需要注册或登录，使用一次性 8 位配对码连接。",
+    "discover.faq2.q": "USend 安全吗？",
+    "discover.faq2.a": "内容会在发送设备本地先加密，真正的加密密钥由两台设备临时协商，服务器无法解密内容。",
+    "discover.faq3.q": "文件会保存多久？",
+    "discover.faq3.a": "传输完成后临时数据会删除；如果没有接收，默认最长保留 5 分钟，最多 10 分钟。",
+    "discover.faq4.q": "USend 支持哪些文件？",
+    "discover.faq4.a": "支持常见文件和文字内容，单个文件最大 20 MB。",
+    "discover.openSource": "查看开源项目与安全说明",
+
     // ---- receive entry ----
     "recv.eyebrow": "输入配对码",
     "recv.h2": "输入 8 位配对码",
@@ -199,11 +221,12 @@ const DICT = {
 
   en: {
     // ---- document / meta ----
-    "doc.title": "InstantFlow · Secure device-to-device transfers",
+    "doc.title": "USend · Secure device-to-device transfers",
+    "doc.description": "USend is a secure file and text transfer tool with no sign-up. Use a one-time pairing code between your phone and computer, with end-to-end encryption and automatic cleanup.",
     "doc.lang": "en",
 
     // ---- topbar ----
-    "brand.eyebrow": "INSTANTFLOW",
+    "brand.eyebrow": "USEND",
     "top.trust": "End-to-end encrypted",
     "lang.label": "Language",
     "lang.switchTo": "Switch to 中文",
@@ -220,7 +243,7 @@ const DICT = {
     "star.hero.sub.hasStars": "{count} stars · fully open-source, no tracking",
     "star.hero.sub.firstStar": "Fully open-source, no tracking, no accounts · waiting for its first star",
     "star.hero.cta": "Star it",
-    "star.ended.cta": "Drop a Star so more people can find InstantFlow",
+    "star.ended.cta": "Drop a Star so more people can find USend",
     "star.footer": "Open-source, no tracking · Star to support",
 
     // ---- footer ----
@@ -308,6 +331,27 @@ const DICT = {
     "how.2.body": "Your devices create the encryption key. The server can't decrypt the content.",
     "how.3.title": "Automatic cleanup",
     "how.3.body": "Temporary data is deleted after receipt or when time runs out.",
+
+    // ---- discovery content ----
+    "discover.kicker": "WHY USEND",
+    "discover.title": "No sign-in, no shared folder.\nJust a quick transfer.",
+    "discover.intro": "Send a file or a piece of text to another device without creating an account or leaving a permanent public link.",
+    "discover.card1.title": "Phone to computer",
+    "discover.card1.body": "Choose a file on your phone, then enter the one-time pairing code on your computer to receive it.",
+    "discover.card2.title": "Temporary file sharing",
+    "discover.card2.body": "Send a contract, screenshot, attachment, or archive without uploading it to a shared drive or granting lasting access.",
+    "discover.card3.title": "Move text and links",
+    "discover.card3.body": "Move an address or a temporary note between devices, then copy it where you need it.",
+    "discover.faq.title": "Frequently asked questions",
+    "discover.faq1.q": "Do I need an account?",
+    "discover.faq1.a": "No. Neither device needs an account. They connect with a one-time 8-digit pairing code.",
+    "discover.faq2.q": "Is USend secure?",
+    "discover.faq2.a": "Content is encrypted on the sending device first. The two devices negotiate the real encryption key, so the server cannot decrypt the content.",
+    "discover.faq3.q": "How long is a file kept?",
+    "discover.faq3.a": "Temporary data is deleted after receipt. If nobody receives it, it expires after 5 minutes by default and at most 10 minutes.",
+    "discover.faq4.q": "What can I send?",
+    "discover.faq4.a": "You can send common files and text. Each file can be up to 20 MB.",
+    "discover.openSource": "View the open-source project and security notes",
 
     // ---- receive entry ----
     "recv.eyebrow": "Enter pairing code",
@@ -403,6 +447,9 @@ export function LangProvider({ children }) {
       document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
       const dictTitle = DICT[lang]?.["doc.title"];
       if (dictTitle) document.title = dictTitle;
+      const description = DICT[lang]?.["doc.description"];
+      const descriptionMeta = document.querySelector('meta[name="description"]');
+      if (description && descriptionMeta) descriptionMeta.setAttribute("content", description);
     }
   }, [lang]);
 

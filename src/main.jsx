@@ -58,7 +58,7 @@ const apiBinary = async (path, options = {}) => {
   return new Uint8Array(await response.arrayBuffer());
 };
 
-const REPO_URL = "https://github.com/frankfika/instantflow";
+const REPO_URL = "https://github.com/frankfika/usend";
 
 function App() {
   return (
@@ -98,7 +98,7 @@ function useStarCount() {
       }
     } catch {}
     let cancelled = false;
-    fetch("https://api.github.com/repos/frankfika/instantflow")
+    fetch("https://api.github.com/repos/frankfika/usend")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (cancelled || !d) return;
@@ -175,7 +175,7 @@ function Shell({ children }) {
       <header className="topbar">
         <a className="brand" href="/">
           <span className="brand-mark">
-            <img src="/brand/instantflow-mark.svg" alt="" />
+            <img src="/brand/usend-mark.svg" alt="USend" />
           </span>
           <span>{t("brand.eyebrow")}</span>
         </a>
@@ -632,8 +632,50 @@ function UnifiedHome() {
             />
           </div>
         </section>
+        <DiscoveryContent />
       </main>
     </Shell>
+  );
+}
+
+function DiscoveryContent() {
+  const { t } = useLang();
+  const cards = [
+    { title: t("discover.card1.title"), body: t("discover.card1.body") },
+    { title: t("discover.card2.title"), body: t("discover.card2.body") },
+    { title: t("discover.card3.title"), body: t("discover.card3.body") },
+  ];
+  const faqs = [1, 2, 3, 4];
+  return (
+    <section className="discovery-content" aria-labelledby="discover-title">
+      <div className="discovery-intro">
+        <span className="section-kicker">{t("discover.kicker")}</span>
+        <h2 id="discover-title"><Multiline text={t("discover.title")} /></h2>
+        <p>{t("discover.intro")}</p>
+      </div>
+      <div className="discovery-cards">
+        {cards.map((card) => (
+          <article className="discovery-card" key={card.title}>
+            <h3>{card.title}</h3>
+            <p>{card.body}</p>
+          </article>
+        ))}
+      </div>
+      <div className="faq-block">
+        <h2>{t("discover.faq.title")}</h2>
+        <div className="faq-list">
+          {faqs.map((n) => (
+            <details key={n}>
+              <summary>{t(`discover.faq${n}.q`)}</summary>
+              <p>{t(`discover.faq${n}.a`)}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+      <a className="discovery-source" href={REPO_URL} target="_blank" rel="noopener noreferrer">
+        <GithubIcon size={15} /> {t("discover.openSource")} <ArrowUpRight size={15} />
+      </a>
+    </section>
   );
 }
 

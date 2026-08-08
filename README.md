@@ -1,28 +1,30 @@
 <div align="center">
 
-# 瞬传 InstantFlow
+# USend
 
 > 不登录、不复制链接，让信息只在两台设备之间短暂存在。  
 > Account-free, link-free, end-to-end encrypted temporary transfer.
 
-[![Version](https://img.shields.io/badge/version-0.1.0-315fbd?style=flat-square)](https://github.com/frankfika/instantflow/releases/tag/v0.1.0)
+[![Version](https://img.shields.io/badge/version-0.1.0-315fbd?style=flat-square)](https://github.com/frankfika/usend/releases/tag/v0.1.0)
 [![React](https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react&logoColor=white)](https://react.dev/)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-f38020?style=flat-square&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 ![E2EE](https://img.shields.io/badge/security-E2EE-2d9d78?style=flat-square)
 
-[在线体验](https://instantflow.chenpitang2020.workers.dev) · [核心功能](#-核心功能) · [快速开始](#-快速开始) · [安全设计](#-安全设计)
+[在线体验](https://usend.xyz/) · [核心功能](#-核心功能) · [快速开始](#-快速开始) · [安全设计](#-安全设计)
 
 __简体中文__ | [English](./README_EN.md)
 
 </div>
 
-![瞬传首页](./docs/assets/home.png)
+![USend 首页](./docs/assets/home_zh.png)
+
+> 截图为中文界面。English screenshots are available in [README_EN.md](./README_EN.md).
 
 ## ✨ 项目简介
 
-瞬传是一款用于设备间临时传输的网页工具。发送方选择文件或文字并生成 8 位配对码，接收方在另一台设备输入配对码即可连接。默认核对双方安全码后发送，内容在发送端加密、经服务端短暂中转，并只在接收端解密。
+USend 是一款用于设备间临时传输的网页工具。发送方选择文件或文字并生成 8 位配对码，接收方在另一台设备输入配对码即可连接。默认核对双方安全码后发送，内容在发送端加密、经服务端短暂中转，并只在接收端解密。
 
-| 常见临时传输方式 | 瞬传 |
+| 常见临时传输方式 | USend |
 | --- | --- |
 | 注册账号或安装客户端 | 浏览器打开即用 |
 | 复制并暴露长期分享链接 | 8 位一次性配对码 |
@@ -44,7 +46,7 @@ __简体中文__ | [English](./README_EN.md)
 - **附加限制**：“仅限同一网络”默认关闭；需要时可手动开启，并可设置至少 8 位的接收密码。
 - **用途隔离派生**：接收密码经随机盐和 PBKDF2-SHA-256（210,000 次）生成独立的验证与加密材料。
 
-![发送安全选项](./docs/assets/settings.png)
+![发送安全选项](./docs/assets/settings_zh.png)
 
 ### 3. 默认短暂存在
 
@@ -56,13 +58,13 @@ __简体中文__ | [English](./README_EN.md)
 
 | 发送文件 | 配置安全限制 | 输入配对码 |
 | --- | --- | --- |
-| ![发送文件](./docs/assets/home.png) | ![安全选项](./docs/assets/settings.png) | ![接收入口](./docs/assets/features.png) |
+| ![发送文件](./docs/assets/home_zh.png) | ![安全选项](./docs/assets/settings_zh.png) | ![接收入口](./docs/assets/features_zh.png) |
 
 ## ⚡ 快速开始
 
 ### 在线使用
 
-直接访问 [instantflow.chenpitang2020.workers.dev](https://instantflow.chenpitang2020.workers.dev)：
+直接访问 [usend.xyz](https://usend.xyz/)：
 
 1. 发送设备选择文件或文字，按需调整安全码核对、网络限制和接收密码。
 2. 生成配对码，并在接收设备输入。
@@ -74,8 +76,8 @@ __简体中文__ | [English](./README_EN.md)
 需要 Node.js 20 或更高版本。
 
 ```bash
-git clone https://github.com/frankfika/instantflow.git
-cd instantflow
+git clone https://github.com/frankfika/usend.git
+cd usend
 npm install
 npm run dev
 ```
@@ -109,7 +111,7 @@ flowchart LR
 
 进一步了解：[安全模型](./SECURITY.md) · [隐私说明](./PRIVACY.md) · [安全审计](./SECURITY_AUDIT.md)
 
-> 瞬传可以降低服务端读取临时内容的风险，但不能替代对设备本身、浏览器环境或通信对象身份的信任判断。
+> USend 可以降低服务端读取临时内容的风险，但不能替代对设备本身、浏览器环境或通信对象身份的信任判断。
 
 ## 🧪 验证与发布
 
@@ -125,4 +127,12 @@ npm run deploy:dry-run
 
 ## 📦 版本
 
-当前版本为 [v0.1.0](https://github.com/frankfika/instantflow/releases/tag/v0.1.0)，更新记录与发布说明请查看 [GitHub Releases](https://github.com/frankfika/instantflow/releases)。
+当前版本为 [v0.1.0](https://github.com/frankfika/usend/releases/tag/v0.1.0)，更新记录与发布说明请查看 [GitHub Releases](https://github.com/frankfika/usend/releases)。
+
+## ☕ 支持项目
+
+如果 USend 对你有帮助，欢迎请作者喝杯咖啡。感谢你的支持！
+
+<div align="center">
+  <img src="./docs/assets/wechat-pay.jpg" alt="微信支付打赏二维码" width="320" />
+</div>

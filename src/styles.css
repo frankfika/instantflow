@@ -1,5 +1,5 @@
 /* ============================================
-   InstantFlow — Vibrant & Compact
+   USend — Vibrant & Compact
    ============================================ */
 
 :root {
@@ -1546,6 +1546,113 @@ h1 em {
   font-size: 11px;
   position: relative;
   z-index: 1;
+}
+
+/* ---- Search-friendly discovery content ---- */
+.discovery-content {
+  width: min(760px, 100%);
+  margin: 36px auto 0;
+  padding: 40px 0 18px;
+  border-top: 1px solid var(--line);
+}
+
+.discovery-intro {
+  max-width: 620px;
+}
+
+.discovery-intro h2,
+.faq-block h2 {
+  margin: 10px 0 12px;
+  color: var(--ink);
+  font-size: clamp(24px, 4vw, 34px);
+  line-height: 1.18;
+  letter-spacing: -0.04em;
+}
+
+.discovery-intro p,
+.discovery-card p,
+.faq-list p {
+  color: var(--ink-soft);
+  line-height: 1.75;
+}
+
+.discovery-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.discovery-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.discovery-card h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.discovery-card p {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.faq-block {
+  margin-top: 42px;
+}
+
+.faq-block h2 {
+  font-size: 22px;
+}
+
+.faq-list {
+  border-top: 1px solid var(--line);
+}
+
+.faq-list details {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-list summary {
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.faq-list p {
+  margin: 10px 0 0;
+  font-size: 13px;
+}
+
+.discovery-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 26px;
+  color: var(--blue-deep);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.discovery-source:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+  .discovery-content {
+    padding: 30px 16px 14px;
+  }
+
+  .discovery-cards {
+    grid-template-columns: 1fr;
+  }
 }
 
 .footer-link {

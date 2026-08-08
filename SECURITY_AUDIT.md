@@ -1,4 +1,4 @@
-# InstantFlow 开源安全审计报告
+# USend 开源安全审计报告
 
 审计日期：2026-08-02  
 范围：浏览器端、Node.js 参考服务、Cloudflare Worker / Durable Objects、依赖与锁文件、CI/CD、仓库文件卫生和安全文档。

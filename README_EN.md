@@ -1,28 +1,30 @@
 <div align="center">
 
-# InstantFlow
+# USend
 
 > No account. No copied link. Let information exist briefly between two devices.  
 > 不登录、不复制链接，让信息只在两台设备之间短暂存在。
 
-[![Version](https://img.shields.io/badge/version-0.1.0-315fbd?style=flat-square)](https://github.com/frankfika/instantflow/releases/tag/v0.1.0)
+[![Version](https://img.shields.io/badge/version-0.1.0-315fbd?style=flat-square)](https://github.com/frankfika/usend/releases/tag/v0.1.0)
 [![React](https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react&logoColor=white)](https://react.dev/)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-f38020?style=flat-square&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 ![E2EE](https://img.shields.io/badge/security-E2EE-2d9d78?style=flat-square)
 
-[Live Demo](https://instantflow.chenpitang2020.workers.dev) · [Features](#-features) · [Quick Start](#-quick-start) · [Security](#-security)
+[Live Demo](https://usend.xyz/) · [Features](#-features) · [Quick Start](#-quick-start) · [Security](#-security)
 
 [简体中文](./README.md) | __English__
 
 </div>
 
-![InstantFlow home screen](./docs/assets/home.png)
+![USend home screen](./docs/assets/home_en.png)
+
+> Screenshots show the English UI. 中文界面截图见 [README.md](./README.md).
 
 ## ✨ Introduction
 
-InstantFlow is a web app for temporary device-to-device transfers. The sender selects a file or text and creates an eight-digit pairing code. The receiver enters it on another device to connect. By default, the sender checks that both devices show the same security code before sending. Content is encrypted by the sender, briefly relayed by the server, and decrypted only by the receiver.
+USend is a web app for temporary device-to-device transfers. The sender selects a file or text and creates an eight-digit pairing code. The receiver enters it on another device to connect. By default, the sender checks that both devices show the same security code before sending. Content is encrypted by the sender, briefly relayed by the server, and decrypted only by the receiver.
 
-| Typical temporary transfer | InstantFlow |
+| Typical temporary transfer | USend |
 | --- | --- |
 | Account registration or app installation | Open it in a browser |
 | Long-lived shared links | Eight-digit one-time pairing code |
@@ -44,7 +46,7 @@ InstantFlow is a web app for temporary device-to-device transfers. The sender se
 - **Optional restrictions**: “Same network only” is off by default. Enable it explicitly when needed, and optionally add a receive password of at least eight characters.
 - **Domain-separated derivation**: A receive password is processed with a random salt and PBKDF2-SHA-256 (210,000 iterations) to derive separate verification and encryption material.
 
-![Transfer security options](./docs/assets/settings.png)
+![Transfer security options](./docs/assets/settings_en.png)
 
 ### 3. Ephemeral by default
 
@@ -56,13 +58,13 @@ InstantFlow is a web app for temporary device-to-device transfers. The sender se
 
 | Send a file | Configure restrictions | Enter a pairing code |
 | --- | --- | --- |
-| ![Send a file](./docs/assets/home.png) | ![Security options](./docs/assets/settings.png) | ![Receive screen](./docs/assets/features.png) |
+| ![Send a file](./docs/assets/home_en.png) | ![Security options](./docs/assets/settings_en.png) | ![Receive screen](./docs/assets/features_en.png) |
 
 ## ⚡ Quick Start
 
 ### Use the hosted app
 
-Open [instantflow.chenpitang2020.workers.dev](https://instantflow.chenpitang2020.workers.dev):
+Open [usend.xyz](https://usend.xyz/):
 
 1. Select a file or text on the sending device, then adjust the security-code check and optional restrictions as needed.
 2. Create a pairing code and enter it on the receiving device.
@@ -74,8 +76,8 @@ Open [instantflow.chenpitang2020.workers.dev](https://instantflow.chenpitang2020
 Node.js 20 or later is required.
 
 ```bash
-git clone https://github.com/frankfika/instantflow.git
-cd instantflow
+git clone https://github.com/frankfika/usend.git
+cd usend
 npm install
 npm run dev
 ```
@@ -109,7 +111,7 @@ The server never receives a private key or content key. Ciphertext downloads req
 
 Learn more: [Security model](./SECURITY.md) · [Privacy notice](./PRIVACY.md) · [Security audit](./SECURITY_AUDIT.md)
 
-> InstantFlow reduces the risk of server-side access to temporary content. It does not replace trust in the devices, browser environment, or the identity of the other participant.
+> USend reduces the risk of server-side access to temporary content. It does not replace trust in the devices, browser environment, or the identity of the other participant.
 
 ## 🧪 Validation and deployment
 
@@ -125,4 +127,12 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for production deployment and secret config
 
 ## 📦 Releases
 
-The current version is [v0.1.0](https://github.com/frankfika/instantflow/releases/tag/v0.1.0). See [GitHub Releases](https://github.com/frankfika/instantflow/releases) for release notes and future updates.
+The current version is [v0.1.0](https://github.com/frankfika/usend/releases/tag/v0.1.0). See [GitHub Releases](https://github.com/frankfika/usend/releases) for release notes and future updates.
+
+## ☕ Support the project
+
+If USend has been useful to you, consider buying the author a coffee. Thank you for your support!
+
+<div align="center">
+  <img src="./docs/assets/wechat-pay.jpg" alt="WeChat Pay donation QR code" width="320" />
+</div>
