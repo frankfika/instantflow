@@ -7,15 +7,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 export const LANGS = ["zh", "en"];
 const STORAGE_KEY = "instantflow:lang";
 
-// 推断初始语言：localStorage > 浏览器 navigator.language > 默认 zh
+// 推断初始语言：用户主动选择的语言 > 默认 zh
 export function detectLang() {
   if (typeof window === "undefined") return "zh";
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === "zh" || saved === "en") return saved;
   } catch {}
-  const nav = (navigator.language || "zh").toLowerCase();
-  return nav.startsWith("en") ? "en" : "zh";
+  return "zh";
 }
 
 // 翻译字典。带 {name} {count} {n} 的字符串支持插值。
