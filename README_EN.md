@@ -20,7 +20,7 @@
 
 ## ✨ Introduction
 
-InstantFlow is a web app for temporary information exchange. The sender selects a file or text and creates an eight-digit, one-time pairing code. The receiver enters that code on another device to establish a connection. Content is encrypted on the sender only after both sides verify the same security code, briefly relayed by the server, and decrypted locally by the receiver.
+InstantFlow is a web app for temporary device-to-device transfers. The sender selects a file or text and creates an eight-digit pairing code. The receiver enters it on another device to connect. By default, the sender checks that both devices show the same security code before sending. Content is encrypted by the sender, briefly relayed by the server, and decrypted only by the receiver.
 
 | Typical temporary transfer | InstantFlow |
 | --- | --- |
@@ -40,9 +40,9 @@ InstantFlow is a web app for temporary information exchange. The sender selects 
 ### 2. A visible, verifiable security flow
 
 - **End-to-end encryption**: The devices negotiate a shared secret with ECDH P-256, then derive an AES-256-GCM content key with HKDF-SHA-256.
-- **Security code**: Transfer starts only after both sides confirm that their verification codes match.
-- **Optional restrictions**: Require the same network exit and add a receiver passphrase of at least eight characters.
-- **Domain-separated derivation**: A passphrase is processed with a random salt and PBKDF2-SHA-256 (210,000 iterations) to derive separate verification and encryption material.
+- **Security code**: By default, the sender confirms that both codes match before sending; confirmation can be disabled for trusted transfers that should start automatically after pairing.
+- **Optional restrictions**: “Same network only” is off by default. Enable it explicitly when needed, and optionally add a receive password of at least eight characters.
+- **Domain-separated derivation**: A receive password is processed with a random salt and PBKDF2-SHA-256 (210,000 iterations) to derive separate verification and encryption material.
 
 ![Transfer security options](./docs/assets/settings.png)
 
@@ -64,10 +64,10 @@ InstantFlow is a web app for temporary information exchange. The sender selects 
 
 Open [instantflow.chenpitang2020.workers.dev](https://instantflow.chenpitang2020.workers.dev):
 
-1. Select a file or text on the sending device, then choose an expiry time and optional restrictions.
-2. Create a one-time pairing code and enter it on the receiving device.
-3. Verify that both devices show the same security code.
-4. Confirm the transfer. Temporary server-side data is destroyed after successful receipt.
+1. Select a file or text on the sending device, then adjust the security-code check and optional restrictions as needed.
+2. Create a pairing code and enter it on the receiving device.
+3. Check both security codes by default, or let the transfer start automatically if the sender disabled the check.
+4. Temporary server-side data is destroyed after successful receipt.
 
 ### Run locally
 
@@ -126,4 +126,3 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for production deployment and secret config
 ## 📦 Releases
 
 The current version is [v0.1.0](https://github.com/frankfika/instantflow/releases/tag/v0.1.0). See [GitHub Releases](https://github.com/frankfika/instantflow/releases) for release notes and future updates.
-

@@ -19,6 +19,7 @@ type RoomRecord = {
   status: "waiting" | "paired" | "uploading" | "ready" | "deleting";
   size: number;
   payloadChunks?: number;
+  requiresVerification: boolean;
   sameNetworkOnly: boolean;
   networkKeyHash?: string;
   passphraseSalt?: string;
@@ -33,6 +34,7 @@ type RoomView = {
   size: number;
   senderPublicKey: PublicKeyJwk;
   receiverPublicKey: PublicKeyJwk | null;
+  requiresVerification: boolean;
   sameNetworkOnly: boolean;
   requiresPassphrase: boolean;
   passphraseSalt?: string;
@@ -183,6 +185,7 @@ const roomView = (room: RoomRecord): RoomView => ({
   size: room.size,
   senderPublicKey: room.senderPublicKey,
   receiverPublicKey: room.receiverPublicKey || null,
+  requiresVerification: room.requiresVerification !== false,
   sameNetworkOnly: room.sameNetworkOnly,
   requiresPassphrase: Boolean(room.passphraseVerifierHash),
   passphraseSalt: room.passphraseVerifierHash ? room.passphraseSalt : undefined,
@@ -576,6 +579,7 @@ const worker = {
               const uploadToken = randomToken(32);
               const createdAt = Date.now();
               const expiresAt = createdAt + minutes * 60_000;
+              const requiresVerification = body.requiresVerification !== false;
               const sameNetworkOnly = body.sameNetworkOnly === true;
               const hasPassphrase =
                 typeof body.passphraseSalt === "string" ||
@@ -615,6 +619,7 @@ const worker = {
                 expiresAt,
                 status: "waiting",
                 size: 0,
+                requiresVerification,
                 sameNetworkOnly,
                 networkKeyHash: sameNetworkOnly
                   ? await sha256(networkIdentity(requestAddress(request)))

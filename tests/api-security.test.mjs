@@ -41,12 +41,12 @@ async function json(path, options = {}) {
   return { response, body };
 }
 
-async function createRoom() {
+async function createRoom(options = {}) {
   const key = await publicKey();
   const { response, body } = await json("/api/rooms", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ minutes: 5, senderPublicKey: key }),
+    body: JSON.stringify({ minutes: 5, senderPublicKey: key, ...options }),
   });
   assert.equal(response.status, 201);
   return body;
@@ -124,10 +124,20 @@ test("room creation validates key and generates the code server-side", async () 
   assert.match(room.code, /^\d{8}$/);
   assert.match(room.roomId, /^[A-Za-z0-9_-]{20,30}$/);
   assert.ok(room.uploadToken.length >= 40);
+  assert.equal(room.requiresVerification, true);
   const visible = await json(`/api/rooms/${room.roomId}`);
   assert.equal(visible.body.code, undefined);
   assert.equal(visible.body.uploadToken, undefined);
   assert.equal(visible.body.envelope, undefined);
+});
+
+test("sender verification is on by default and can be disabled per room", async () => {
+  const automaticRoom = await createRoom({ requiresVerification: false });
+  assert.equal(automaticRoom.requiresVerification, false);
+  const visible = await json(`/api/rooms/${automaticRoom.roomId}`);
+  assert.equal(visible.body.requiresVerification, false);
+  const byCode = await json(`/api/rooms/code/${automaticRoom.code}`);
+  assert.equal(byCode.body.requiresVerification, false);
 });
 
 test("upload and pairing reject invalid credentials and keys", async () => {
