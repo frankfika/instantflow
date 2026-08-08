@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ArrowUpRight,
@@ -30,6 +30,7 @@ import {
   encryptPayload,
   normalizePassphrase,
 } from "./crypto.js";
+import { LangProvider, useLang } from "./i18n.jsx";
 
 // In local development Vite may move to another port; the API remains on 8787.
 // VITE_API_URL can override this for a hosted deployment or reverse proxy.
@@ -58,11 +59,15 @@ const apiBinary = async (path, options = {}) => {
   return new Uint8Array(await response.arrayBuffer());
 };
 
-function App() {
-  return <UnifiedHome />;
-}
-
 const REPO_URL = "https://github.com/frankfika/instantflow";
+
+function App() {
+  return (
+    <LangProvider>
+      <UnifiedHome />
+    </LangProvider>
+  );
+}
 
 function GithubIcon({ size = 16 }) {
   return (
@@ -78,34 +83,121 @@ function GithubIcon({ size = 16 }) {
   );
 }
 
-function GitHubStarButton() {
+function useStarCount() {
   const [stars, setStars] = useState(null);
   useEffect(() => {
+    const cacheKey = "instantflow:stars";
+    const cacheTtl = 10 * 60 * 1000;
+    try {
+      const raw = localStorage.getItem(cacheKey);
+      if (raw) {
+        const cached = JSON.parse(raw);
+        if (Date.now() - cached.t < cacheTtl && typeof cached.s === "number") {
+          setStars(cached.s);
+          return;
+        }
+      }
+    } catch {}
+    let cancelled = false;
     fetch("https://api.github.com/repos/frankfika/instantflow")
-      .then((r) => r.json())
-      .then((d) => setStars(d.stargazers_count ?? null))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (cancelled || !d) return;
+        const s = typeof d.stargazers_count === "number" ? d.stargazers_count : null;
+        setStars(s);
+        if (s != null) {
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify({ s, t: Date.now() }));
+          } catch {}
+        }
+      })
       .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, []);
+  return stars;
+}
+
+function GitHubStarButton() {
+  const { t } = useLang();
+  const stars = useStarCount();
+  const hasStars = stars != null && stars > 0;
+  const starLabel = stars != null ? stars.toLocaleString() : "";
   return (
     <a
       className="gh-star-btn"
       href={REPO_URL}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="在 GitHub 上 Star"
+      aria-label={
+        hasStars
+          ? t("star.aria.hasStars", { count: starLabel })
+          : t("star.aria.firstStar")
+      }
+      title={hasStars ? t("star.title.hasStars", { count: starLabel }) : t("star.title.firstStar")}
     >
-      <GithubIcon size={16} />
-      <span>Star</span>
-      {stars != null && (
-        <span className="gh-star-count">
-          <Star size={12} /> {stars}
+      <Star size={14} className="gh-star-pulse" />
+      <span>{hasStars ? t("star.btn.hasStars") : t("star.btn.firstStar")}</span>
+      {hasStars && (
+        <span className="gh-star-count" data-stars={starLabel}>
+          <Star size={11} /> {starLabel}
         </span>
       )}
     </a>
   );
 }
 
-function Shell({ children, eyebrow = "INSTANTFLOW" }) {
+function HeroStarCta() {
+  const { t } = useLang();
+  const stars = useStarCount();
+  const hasStars = stars != null && stars > 0;
+  return (
+    <a
+      className="hero-star-cta"
+      href={REPO_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={t("star.aria.firstStar")}
+    >
+      <span className="hero-star-ic">
+        <Star size={14} className="hero-star-pulse" />
+      </span>
+      <span className="hero-star-body">
+        <b>{hasStars ? t("star.hero.title.hasStars") : t("star.hero.title.firstStar")}</b>
+        <small>
+          {hasStars
+            ? t("star.hero.sub.hasStars", { count: stars.toLocaleString() })
+            : t("star.hero.sub.firstStar")}
+        </small>
+      </span>
+      <span className="hero-star-go">
+        <GithubIcon size={13} /> {t("star.hero.cta")}
+      </span>
+    </a>
+  );
+}
+
+function LangSwitch() {
+  const { lang, setLang, t } = useLang();
+  const other = lang === "zh" ? "en" : "zh";
+  return (
+    <button
+      type="button"
+      className="lang-switch"
+      onClick={() => setLang(other)}
+      aria-label={t("lang.switchTo")}
+      title={t("lang.switchTo")}
+    >
+      <span className={lang === "zh" ? "lang-active" : ""}>中</span>
+      <span className="lang-sep">/</span>
+      <span className={lang === "en" ? "lang-active" : ""}>EN</span>
+    </button>
+  );
+}
+
+function Shell({ children }) {
+  const { t } = useLang();
   return (
     <div className="app-shell">
       <div className="ambient ambient-a" />
@@ -115,22 +207,23 @@ function Shell({ children, eyebrow = "INSTANTFLOW" }) {
           <span className="brand-mark">
             <img src="/brand/instantflow-mark.svg" alt="" />
           </span>
-          <span>{eyebrow}</span>
+          <span>{t("brand.eyebrow")}</span>
         </a>
         <div className="top-right">
           <div className="top-trust">
             <span className="status-dot" />
-            端到端临时传输
+            {t("top.trust")}
           </div>
+          <LangSwitch />
           <GitHubStarButton />
         </div>
       </header>
       {children}
       <footer className="footer">
-        <span>无账号 · 无历史 · 端到端加密</span>
+        <span>{t("footer.left")}</span>
         <div className="footer-links">
           <span className="footer-link">
-            <ShieldCheck size={13} /> 临时传输，阅后即焚
+            <ShieldCheck size={13} /> {t("footer.privacy")}
           </span>
           <a
             className="footer-link footer-gh"
@@ -138,7 +231,7 @@ function Shell({ children, eyebrow = "INSTANTFLOW" }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <GithubIcon size={13} /> 开源项目 · 欢迎 Star
+            <Star size={13} className="footer-star" /> {t("star.footer")}
           </a>
         </div>
       </footer>
@@ -147,34 +240,51 @@ function Shell({ children, eyebrow = "INSTANTFLOW" }) {
 }
 
 function TrustStrip() {
+  const { t } = useLang();
   return (
     <div className="trust-strip">
       <div>
         <LockKeyhole size={15} />
         <span>
-          <b>本机先加密</b>
-          <small>文件离开设备前已密封</small>
+          <b>{t("trust.encrypt.title")}</b>
+          <small>{t("trust.encrypt.sub")}</small>
         </span>
       </div>
       <div>
         <Clock3 size={15} />
         <span>
-          <b>短时存在</b>
-          <small>最长 10 分钟后自动删除</small>
+          <b>{t("trust.ttl.title")}</b>
+          <small>{t("trust.ttl.sub")}</small>
         </span>
       </div>
       <div>
         <ShieldCheck size={15} />
         <span>
-          <b>无需账号</b>
-          <small>配对码只连接这次传输</small>
+          <b>{t("trust.account.title")}</b>
+          <small>{t("trust.account.sub")}</small>
         </span>
       </div>
     </div>
   );
 }
 
+// 把含 \n 的翻译切成多行（用于 h1/h2 的换行排版）
+function Multiline({ text, as: Tag = "span" }) {
+  const parts = text.split("\n");
+  return (
+    <Tag>
+      {parts.map((p, i) => (
+        <Fragment key={i}>
+          {i > 0 && <br />}
+          {p}
+        </Fragment>
+      ))}
+    </Tag>
+  );
+}
+
 function UnifiedHome() {
+  const { t } = useLang();
   const [mode, setMode] = useState("send");
   const [kind, setKind] = useState("file");
   const [file, setFile] = useState(null);
@@ -200,7 +310,7 @@ function UnifiedHome() {
   const choose = (f) => {
     if (!f) return;
     if (f.size > 20 * 1024 * 1024)
-      return setError("单个文件暂时不能超过 20 MB");
+      return setError(t("drop.tooLarge"));
     setFile(f);
     setError("");
   };
@@ -233,7 +343,7 @@ function UnifiedHome() {
           kind === "file"
             ? file.size
             : new TextEncoder().encode(text).byteLength,
-        name: kind === "file" ? file.name : "临时文字.txt",
+        name: kind === "file" ? file.name : t("text.defaultName"),
       });
       setStage("waiting");
       for (;;) {
@@ -272,7 +382,7 @@ function UnifiedHome() {
         await new Promise((r) => setTimeout(r, 700));
       }
     } catch {
-      setError("传输没有完成，请重新开始。");
+      setError(t("err.transfer"));
       setResult(null);
       setStage("idle");
     } finally {
@@ -299,36 +409,25 @@ function UnifiedHome() {
       <main className="main home-main">
         <section className="hero">
           <h1>
-            {mode === "send"
-              ? "把信息送到另一台设备"
-              : "接收一份临时信息"}
+            {mode === "send" ? t("hero.h1.send") : t("hero.h1.receive")}
           </h1>
           <p>
-            {mode === "send"
-              ? "不登录，不复制链接。选择内容后，用一次性配对码连接另一台设备。"
-              : "输入发送设备上显示的配对码，内容只在这台设备本地解密。"}
+            {mode === "send" ? t("hero.p.send") : t("hero.p.receive")}
           </p>
-          <a
-            className="open-source-badge"
-            href={REPO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <GithubIcon size={14} /> 开源项目 · 欢迎 Star <Star size={13} />
-          </a>
+          <HeroStarCta />
         </section>
         <div className="mode-switch home-mode">
           <button
             className={mode === "send" ? "active" : ""}
             onClick={() => setMode("send")}
           >
-            我要发送
+            {t("mode.send")}
           </button>
           <button
             className={mode === "receive" ? "active" : ""}
             onClick={() => setMode("receive")}
           >
-            我要接收
+            {t("mode.receive")}
           </button>
         </div>
         {mode === "send" ? (
@@ -338,13 +437,13 @@ function UnifiedHome() {
                 className={kind === "file" ? "active" : ""}
                 onClick={() => setKind("file")}
               >
-                <Upload size={16} /> 文件
+                <Upload size={16} /> {t("seg.file")}
               </button>
               <button
                 className={kind === "text" ? "active" : ""}
                 onClick={() => setKind("text")}
               >
-                <FileText size={16} /> 文字
+                <FileText size={16} /> {t("seg.text")}
               </button>
             </div>
             {kind === "file" ? (
@@ -370,17 +469,17 @@ function UnifiedHome() {
                     </span>
                     <span className="drop-title">{file.name}</span>
                     <span className="drop-meta">
-                      {fmt(file.size)} · 已准备在本机加密
+                      {t("drop.filled.meta", { size: fmt(file.size) })}
                     </span>
-                    <span className="change-file">点击更换</span>
+                    <span className="change-file">{t("drop.change")}</span>
                   </>
                 ) : (
                   <>
                     <span className="drop-icon">
                       <Upload size={23} />
                     </span>
-                    <span className="drop-title">拖入文件，或点击选择</span>
-                    <span className="drop-meta">单个文件最大 20 MB</span>
+                    <span className="drop-title">{t("drop.empty.title")}</span>
+                    <span className="drop-meta">{t("drop.empty.meta")}</span>
                   </>
                 )}
               </button>
@@ -389,34 +488,34 @@ function UnifiedHome() {
                 <textarea
                   value={text}
                   onChange={(e) => setText(e.target.value)}
-                  placeholder="粘贴一段文字、地址或临时信息……"
+                  placeholder={t("text.placeholder")}
                   maxLength={12000}
                 />
                 <span className="char-count">
-                  {text.length.toLocaleString()} / 12,000
+                  {t("text.count", { n: text.length.toLocaleString() })}
                 </span>
               </div>
             )}
             <div className="send-options">
               <label>
-                <span>自动删除</span>
+                <span>{t("opt.autoDelete")}</span>
                 <select
                   value={minutes}
                   onChange={(e) => setMinutes(Number(e.target.value))}
                 >
-                  <option value={1}>1 分钟后</option>
-                  <option value={5}>5 分钟后</option>
-                  <option value={10}>10 分钟后</option>
+                  <option value={1}>{t("opt.after1")}</option>
+                  <option value={5}>{t("opt.after5")}</option>
+                  <option value={10}>{t("opt.after10")}</option>
                 </select>
               </label>
               <span className="option-note">
-                <ShieldCheck size={14} /> 两台设备临时协商密钥
+                <ShieldCheck size={14} /> {t("opt.note")}
               </span>
             </div>
             <div className="security-options">
               <div className="security-options-heading">
-                <span>额外限制</span>
-                <small>可选</small>
+                <span>{t("sec.heading")}</span>
+                <small>{t("sec.optional")}</small>
               </div>
               <label className="security-toggle">
                 <input
@@ -427,8 +526,8 @@ function UnifiedHome() {
                 <span className="toggle-box"><Check size={12} /></span>
                 <Wifi size={16} />
                 <span>
-                  <b>仅限同一网络出口</b>
-                  <small>由服务端校验网络指纹，不读取或比较 Wi-Fi 名称</small>
+                  <b>{t("sec.network.title")}</b>
+                  <small>{t("sec.network.sub")}</small>
                 </span>
               </label>
               <label className="security-toggle">
@@ -443,8 +542,8 @@ function UnifiedHome() {
                 <span className="toggle-box"><Check size={12} /></span>
                 <KeyRound size={16} />
                 <span>
-                  <b>增加接收口令</b>
-                  <small>只有同时知道配对码和口令的设备才能加入</small>
+                  <b>{t("sec.passphrase.title")}</b>
+                  <small>{t("sec.passphrase.sub")}</small>
                 </span>
               </label>
               {usePassphrase && (
@@ -457,7 +556,7 @@ function UnifiedHome() {
                       setPassphrase(event.target.value.slice(0, 64));
                       setError("");
                     }}
-                    placeholder="设置至少 8 个字符的接收口令"
+                    placeholder={t("sec.passphrase.placeholder")}
                     autoComplete="new-password"
                     aria-invalid={
                       passphrase.length > 0 && passphraseMissingCharacters > 0
@@ -473,16 +572,16 @@ function UnifiedHome() {
                     }
                   >
                     {passphrase.length === 0
-                      ? "至少 8 个字符"
+                      ? t("sec.passphrase.hint.empty")
                       : passphraseMissingCharacters > 0
-                        ? `还差 ${passphraseMissingCharacters} 个字符，暂时不能生成配对码`
-                        : "口令长度符合要求"}
+                        ? t("sec.passphrase.hint.short", { n: passphraseMissingCharacters })
+                        : t("sec.passphrase.hint.ok")}
                   </small>
                 </div>
               )}
               {sameNetworkOnly && (
                 <p className="network-caveat">
-                  开启 VPN、代理、蜂窝网络或隐私中继时，即使连接同一 Wi-Fi 也可能被拒绝。
+                  {t("sec.network.caveat")}
                 </p>
               )}
             </div>
@@ -495,20 +594,20 @@ function UnifiedHome() {
                 <>
                   <span className="spinner" />{" "}
                   {stage === "room"
-                    ? "建立配对房间…"
+                    ? t("stage.room")
                     : stage === "waiting"
-                      ? "等待另一台设备…"
+                      ? t("stage.waiting")
                       : stage === "verify"
-                        ? "请核对安全校验码…"
+                        ? t("stage.verify")
                       : stage === "encrypt"
-                        ? "正在本机加密…"
-                        : "正在上传密文…"}
+                        ? t("stage.encrypt")
+                        : t("stage.upload")}
                 </>
               ) : (
                 <>
                   {usePassphrase && passphraseMissingCharacters > 0
-                    ? `接收口令还差 ${passphraseMissingCharacters} 个字符`
-                    : "生成一次性配对码"}
+                    ? t("btn.passphraseShort", { n: passphraseMissingCharacters })
+                    : t("btn.generate")}
                   <ArrowUpRight size={17} />
                 </>
               )}
@@ -532,35 +631,33 @@ function UnifiedHome() {
               ?.scrollIntoView({ behavior: "smooth" })
           }
         >
-          它是怎么保护你的？ <ChevronDown size={15} />
+          {t("how.link")} <ChevronDown size={15} />
         </button>
         <section id="how" className="how-section">
           <div>
-            <span className="section-kicker">HOW IT WORKS</span>
+            <span className="section-kicker">{t("how.kicker")}</span>
             <h2>
-              让安全变成
-              <br />
-              看得见的过程。
+              <Multiline text={t("how.title")} />
             </h2>
           </div>
           <div className="how-steps">
             <HowStep
               n="01"
               icon={<LockKeyhole />}
-              title="两台设备临时配对"
-              body="发送和接收都从这一个首页开始。"
+              title={t("how.1.title")}
+              body={t("how.1.body")}
             />
             <HowStep
               n="02"
               icon={<ShieldCheck />}
-              title="设备之间协商密钥"
-              body="配对码只负责找到房间，真正的加密钥匙由两台设备临时生成。"
+              title={t("how.2.title")}
+              body={t("how.2.body")}
             />
             <HowStep
               n="03"
               icon={<Trash2 />}
-              title="到点自动清空"
-              body="倒计时结束后，临时房间和密文一起失效。"
+              title={t("how.3.title")}
+              body={t("how.3.body")}
             />
           </div>
         </section>
@@ -583,6 +680,7 @@ function HowStep({ n, icon, title, body }) {
 }
 
 function ReceiveEntry() {
+  const { t } = useLang();
   const [code, setCode] = useState("");
   const [passphrase, setPassphrase] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
@@ -591,14 +689,14 @@ function ReceiveEntry() {
   const [payload, setPayload] = useState(null);
   const [deletionConfirmed, setDeletionConfirmed] = useState(false);
   const join = async () => {
-    if (!/^\d{8}$/.test(code)) return setError("请输入 8 位配对码");
+    if (!/^\d{8}$/.test(code)) return setError(t("recv.err.code"));
     setState("joining");
     setError("");
     try {
       const found = await api(`/rooms/code/${code}`);
       if (found.requiresPassphrase && !normalizePassphrase(passphrase)) {
         setState("idle");
-        return setError("发送方为这次传输设置了接收口令");
+        return setError(t("recv.err.needPassphrase"));
       }
       const pair = await createPair();
       const passphraseMaterial = found.requiresPassphrase
@@ -648,16 +746,16 @@ function ReceiveEntry() {
     } catch (e) {
       setError(
         e.message === "rate_limited"
-          ? "尝试次数过多，请稍后再试。"
+          ? t("recv.err.rate")
           : e.message === "expired" || e.message === "not_found"
-            ? "这个配对码不存在或已经过期。"
+            ? t("recv.err.notfound")
             : e.message === "already_paired"
-              ? "这次传输已经与另一台设备配对。"
+              ? t("recv.err.paired")
               : e.message === "restricted_network"
-                ? "发送方只允许同一网络下的设备接收。请连接同一 Wi-Fi，并关闭 VPN、代理或蜂窝网络后重试。"
+                ? t("recv.err.network")
                 : e.message === "invalid_passphrase"
-                  ? "接收口令不正确。"
-              : "接收失败，请检查配对码后重试。",
+                  ? t("recv.err.passphrase")
+              : t("recv.err.fallback"),
       );
       setState("idle");
       setVerificationCode("");
@@ -678,9 +776,9 @@ function ReceiveEntry() {
           <CheckCircle2 size={26} />
         </div>
         <span className="ready-eyebrow">
-          <span className="live-dot" /> 已在此设备解密
+          <span className="live-dot" /> {t("done.eyebrow")}
         </span>
-        <h2>{payload.kind === "text" ? "文字已经到达。" : "文件已经到达。"}</h2>
+        <h2>{payload.kind === "text" ? t("done.h2.text") : t("done.h2.file")}</h2>
         {payload.kind === "text" ? (
           <pre className="text-result">
             {new TextDecoder().decode(payload.data)}
@@ -693,19 +791,19 @@ function ReceiveEntry() {
               <small>{fmt(payload.size)}</small>
             </span>
             <button className="primary-btn small" onClick={download}>
-              <Download size={15} /> 保存
+              <Download size={15} /> {t("done.save")}
             </button>
           </div>
         )}
         <p className="delete-confirm">
           {deletionConfirmed ? (
             <>
-              <Check size={14} /> 服务器已确认删除临时密文
+              <Check size={14} /> {t("done.delete.ok")}
             </>
           ) : (
             <>
               <Info size={14} />{" "}
-              内容已解密，但删除确认失败；密文仍会在到期时清除
+              {t("done.delete.fail")}
             </>
           )}
         </p>
@@ -716,18 +814,16 @@ function ReceiveEntry() {
       <div className="receive-lock">
         <QrCode size={24} />
       </div>
-      <span className="ready-eyebrow">输入一次性配对码</span>
+      <span className="ready-eyebrow">{t("recv.eyebrow")}</span>
       <h2>
-        让两台设备
-        <br />
-        <em>认出彼此。</em>
+        <Multiline text={t("recv.h2")} />
       </h2>
-      <p>配对码只在这次传输中有效，不需要链接或账号。</p>
+      <p>{t("recv.p")}</p>
       <input
         className="code-input"
         value={code}
         onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
-        placeholder="0000 0000"
+        placeholder={t("recv.code.placeholder")}
         inputMode="numeric"
         maxLength={8}
       />
@@ -737,7 +833,7 @@ function ReceiveEntry() {
           type="password"
           value={passphrase}
           onChange={(event) => setPassphrase(event.target.value.slice(0, 64))}
-          placeholder="接收口令（如果发送方设置了）"
+          placeholder={t("recv.passphrase.placeholder")}
           autoComplete="current-password"
         />
       </div>
@@ -748,23 +844,23 @@ function ReceiveEntry() {
       >
         {state === "joining" ? (
           <>
-            <span className="spinner" /> 正在配对…
+            <span className="spinner" /> {t("recv.btn.joining")}
           </>
         ) : state === "waiting" ? (
           <>
-            <span className="spinner" /> 等待发送设备…
+            <span className="spinner" /> {t("recv.btn.waiting")}
           </>
         ) : (
           <>
-            开始接收 <ArrowUpRight size={17} />
+            {t("recv.btn.start")} <ArrowUpRight size={17} />
           </>
         )}
       </button>
       {state === "waiting" && verificationCode && (
         <div className="verification-box" role="status">
-          <span>安全校验码</span>
+          <span>{t("recv.verify.label")}</span>
           <strong>{verificationCode}</strong>
-          <small>请与发送设备核对；不一致时立即取消。</small>
+          <small>{t("recv.verify.hint")}</small>
         </div>
       )}
       {error && (
@@ -775,13 +871,14 @@ function ReceiveEntry() {
       )}
       <small className="receive-warning">
         <ShieldCheck size={13} />{" "}
-        配对成功后，真正的加密钥匙只在两台设备之间生成。
+        {t("recv.warn")}
       </small>
     </div>
   );
 }
 
 function ReadyPage({ result, onReset, onVerify, stage }) {
+  const { t } = useLang();
   const [endReason, setEndReason] = useState(null);
   const ended = Boolean(endReason);
   const [left, setLeft] = useState(
@@ -831,16 +928,16 @@ function ReadyPage({ result, onReset, onVerify, stage }) {
   };
   const endCopy = {
     received: {
-      eyebrow: "对方已安全接收",
-      message: "对方已接收，服务器上的临时密文已删除",
+      eyebrow: t("end.received.eyebrow"),
+      message: t("end.received.message"),
     },
     expired: {
-      eyebrow: "传输已到期",
-      message: "保存时间已结束，房间和临时密文已删除",
+      eyebrow: t("end.expired.eyebrow"),
+      message: t("end.expired.message"),
     },
     revoked: {
-      eyebrow: "已主动销毁",
-      message: "房间和临时密文已立即删除",
+      eyebrow: t("end.revoked.eyebrow"),
+      message: t("end.revoked.message"),
     },
   }[endReason];
   return (
@@ -855,21 +952,13 @@ function ReadyPage({ result, onReset, onVerify, stage }) {
         </div>
         <div className="ready-eyebrow">
           <span className="live-dot" />
-          {ended ? ` ${endCopy.eyebrow}` : " 等待另一台设备配对"}
+          {ended ? ` ${endCopy.eyebrow}` : ` ${t("ready.eyebrow.waiting")}`}
         </div>
         <h1>
           {ended ? (
-            <>
-              这次传输
-              <br />
-              <em>已经安全结束。</em>
-            </>
+            <Multiline text={t("ready.h1.ended")} />
           ) : (
-            <>
-              告诉对方这组
-              <br />
-              <em>一次性配对码。</em>
-            </>
+            <Multiline text={t("ready.h1.waiting")} />
           )}
         </h1>
         <p className="ready-sub">
@@ -886,14 +975,14 @@ function ReadyPage({ result, onReset, onVerify, stage }) {
               <div className="pair-code">
                 {result.code.slice(0, 4)} <span>{result.code.slice(4)}</span>
               </div>
-              <p className="pair-hint">在接收设备首页输入这 8 位数字</p>
+              <p className="pair-hint">{t("ready.pair.hint")}</p>
               {(result.sameNetworkOnly || result.requiresPassphrase) && (
                 <div className="restriction-badges">
                   {result.sameNetworkOnly && (
-                    <span><Wifi size={12} /> 仅限同一网络出口</span>
+                    <span><Wifi size={12} /> {t("ready.badge.network")}</span>
                   )}
                   {result.requiresPassphrase && (
-                    <span><KeyRound size={12} /> 需要接收口令</span>
+                    <span><KeyRound size={12} /> {t("ready.badge.passphrase")}</span>
                   )}
                 </div>
               )}
@@ -901,17 +990,17 @@ function ReadyPage({ result, onReset, onVerify, stage }) {
           )}
           {!ended && stage === "verify" && result.verificationCode && (
             <div className="verification-box" role="status">
-              <span>双方安全校验码</span>
+              <span>{t("ready.verify.label")}</span>
               <strong>{result.verificationCode}</strong>
-              <small>与接收设备一致后，才会开始加密和上传。</small>
+              <small>{t("ready.verify.hint")}</small>
               <button className="primary-btn small" onClick={onVerify}>
-                <Check size={15} /> 两边一致，继续发送
+                <Check size={15} /> {t("ready.verify.btn")}
               </button>
             </div>
           )}
           {!ended && (
             <div className="countdown">
-              <span>自动删除倒计时</span>
+              <span>{t("ready.countdown")}</span>
               <strong>
                 {String(Math.floor(left / 60)).padStart(2, "0")}:
                 {String(left % 60).padStart(2, "0")}
@@ -921,13 +1010,13 @@ function ReadyPage({ result, onReset, onVerify, stage }) {
           <div className="privacy-callout">
             <ShieldCheck size={16} />
             <span>
-              <b>没有链接，也没有账号</b>
-              <small>配对码只负责找到房间，加密钥匙由两台设备临时协商。</small>
+              <b>{t("ready.privacy.title")}</b>
+              <small>{t("ready.privacy.sub")}</small>
             </span>
           </div>
           <div className="ready-actions">
             <button className="secondary-btn" onClick={onReset}>
-              <RotateCcw size={15} /> 再传一个
+              <RotateCcw size={15} /> {t("ready.btn.again")}
             </button>
             <button
               className="danger-btn"
@@ -936,11 +1025,11 @@ function ReadyPage({ result, onReset, onVerify, stage }) {
             >
               {ended ? (
                 <>
-                  <Check size={15} /> 已结束
+                  <Check size={15} /> {t("ready.btn.ended")}
                 </>
               ) : (
                 <>
-                  <Trash2 size={15} /> 立即销毁
+                  <Trash2 size={15} /> {t("ready.btn.destroy")}
                 </>
               )}
             </button>
@@ -949,14 +1038,26 @@ function ReadyPage({ result, onReset, onVerify, stage }) {
         <div className="ready-note">
           {ended ? (
             <>
-              <CheckCircle2 size={15} /> 本次配对码已经失效，不能再次接收
+              <CheckCircle2 size={15} /> {t("ready.note.ended")}
             </>
           ) : (
             <>
-              <QrCode size={15} /> 只需告诉对方配对码，不需要复制任何链接
+              <QrCode size={15} /> {t("ready.note.waiting")}
             </>
           )}
         </div>
+        {ended && (
+          <a
+            className="ended-star-cta"
+            href={REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Star size={14} className="hero-star-pulse" />
+            <span>{t("star.ended.cta")}</span>
+            <ArrowUpRight size={13} />
+          </a>
+        )}
       </main>
     </Shell>
   );
