@@ -28,6 +28,10 @@
       ]
     }
   ],
+  "routes": [
+    { "pattern": "usend.xyz", "custom_domain": true },
+    { "pattern": "www.usend.xyz", "custom_domain": true }
+  ],
   "vars": { "ENVIRONMENT": "production" },
   "observability": { "enabled": true, "head_sampling_rate": 1 }
 }
