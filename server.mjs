@@ -90,6 +90,7 @@ const safeRoom = (room) => ({
   size: room.size || 0,
   receiverPublicKey: room.receiverPublicKey || null,
   senderPublicKey: room.senderPublicKey,
+  requiresVerification: room.requiresVerification !== false,
   sameNetworkOnly: Boolean(room.sameNetworkOnly),
   requiresPassphrase: Boolean(room.passphraseVerifierDigest),
   passphraseSalt: room.passphraseVerifierDigest ? room.passphraseSalt : undefined,
@@ -283,6 +284,7 @@ const server = http.createServer(async (req, res) => {
           : 0;
       const ttlMs =
         ttlOverride > 0 ? Math.max(50, ttlOverride) : minutes * 60_000;
+      const requiresVerification = body.requiresVerification !== false;
       const sameNetworkOnly = body.sameNetworkOnly === true;
       const hasPassphrase =
         typeof body.passphraseSalt === "string" ||
@@ -304,6 +306,7 @@ const server = http.createServer(async (req, res) => {
         expiresAt: Date.now() + ttlMs,
         envelope: null,
         size: 0,
+        requiresVerification,
         sameNetworkOnly,
         networkKeyDigest: sameNetworkOnly
           ? hashToken(networkIdentity(clientIp(req)))

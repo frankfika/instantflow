@@ -38,12 +38,13 @@ try {
   await page.getByPlaceholder("粘贴一段文字、地址或临时信息……").fill(
     "这是一段只在两台设备之间短暂存在的示例文字。",
   );
-  await page.getByText("仅限同一网络出口", { exact: true }).click();
-  await page.getByText("增加接收口令", { exact: true }).click();
-  await page.getByPlaceholder("设置至少 8 个字符的接收口令").fill("instant-flow-demo");
+  await page.getByRole("button", { name: /传输设置/ }).click();
+  await page.getByText("仅限同一网络", { exact: true }).click();
+  await page.getByText("设置接收密码", { exact: true }).click();
+  await page.getByPlaceholder("至少 8 个字符").fill("instant-flow-demo");
   await capture("settings");
 
-  await page.getByRole("button", { name: "我要接收" }).click();
+  await page.getByRole("button", { name: "接收", exact: true }).click();
   await page.getByPlaceholder("0000 0000").fill("48273165");
   await capture("features");
 } finally {

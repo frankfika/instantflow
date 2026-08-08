@@ -190,20 +190,7 @@ function Shell({ children }) {
       </header>
       {children}
       <footer className="footer">
-        <span>{t("footer.left")}</span>
-        <div className="footer-links">
-          <span className="footer-link">
-            <ShieldCheck size={13} /> {t("footer.privacy")}
-          </span>
-          <a
-            className="footer-link footer-gh"
-            href={REPO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <GithubIcon size={13} /> <Star size={13} className="footer-star" /> {t("star.footer")}
-          </a>
-        </div>
+        <span className="footer-link"><ShieldCheck size={13} /> {t("footer.left")}</span>
       </footer>
     </div>
   );
@@ -231,9 +218,11 @@ function UnifiedHome() {
   const [file, setFile] = useState(null);
   const [text, setText] = useState("");
   const [minutes, setMinutes] = useState(5);
+  const [requiresVerification, setRequiresVerification] = useState(true);
   const [sameNetworkOnly, setSameNetworkOnly] = useState(false);
   const [usePassphrase, setUsePassphrase] = useState(false);
   const [passphrase, setPassphrase] = useState("");
+  const [securityOpen, setSecurityOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [stage, setStage] = useState("idle");
   const [result, setResult] = useState(null);
@@ -249,6 +238,13 @@ function UnifiedHome() {
   );
   const canSend =
     hasContent && (!usePassphrase || normalizedPassphraseLength >= 8);
+  const securitySummary = [
+    requiresVerification ? t("sec.summary.confirm") : t("sec.summary.auto"),
+    sameNetworkOnly ? t("sec.summary.network") : t("sec.summary.internet"),
+    usePassphrase ? t("sec.summary.passphrase") : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
   const choose = (f) => {
     if (!f) return;
     if (f.size > 20 * 1024 * 1024)
@@ -274,6 +270,7 @@ function UnifiedHome() {
         body: JSON.stringify({
           minutes,
           senderPublicKey: pair.publicKey,
+          requiresVerification,
           sameNetworkOnly,
           passphraseSalt,
           passphraseVerifier,
@@ -297,16 +294,18 @@ function UnifiedHome() {
             status.receiverPublicKey,
             passphraseMaterial?.encryptionSecret,
           );
-          setResult((current) => ({
-            ...current,
-            verificationCode: session.verificationCode,
-          }));
-          setStage("verify");
-          const verified = await new Promise((resolve) => {
-            verificationResolverRef.current = resolve;
-          });
-          verificationResolverRef.current = null;
-          if (!verified) throw new Error("verification_cancelled");
+          if (requiresVerification) {
+            setResult((current) => ({
+              ...current,
+              verificationCode: session.verificationCode,
+            }));
+            setStage("verify");
+            const verified = await new Promise((resolve) => {
+              verificationResolverRef.current = resolve;
+            });
+            verificationResolverRef.current = null;
+            if (!verified) throw new Error("verification_cancelled");
+          }
           setStage("encrypt");
           const envelope = await encryptPayload(
             kind === "file" ? { kind, file } : { kind, text },
@@ -447,77 +446,103 @@ function UnifiedHome() {
                 </select>
               </label>
             </div>
-            <div className="security-options">
-              <div className="security-options-heading">
-                <span>{t("sec.heading")}</span>
-                <small>{t("sec.optional")}</small>
-              </div>
-              <label className="security-toggle">
-                <input
-                  type="checkbox"
-                  checked={sameNetworkOnly}
-                  onChange={(event) => setSameNetworkOnly(event.target.checked)}
-                />
-                <span className="toggle-box"><Check size={12} /></span>
-                <Wifi size={16} />
+            <div className={`security-options ${securityOpen ? "is-open" : ""}`}>
+              <button
+                type="button"
+                className="security-options-heading"
+                aria-expanded={securityOpen}
+                onClick={() => setSecurityOpen((open) => !open)}
+              >
                 <span>
-                  <b>{t("sec.network.title")}</b>
-                  <small>{t("sec.network.sub")}</small>
+                  <ShieldCheck size={16} />
+                  <b>{t("sec.heading")}</b>
+                  <small>{securitySummary}</small>
                 </span>
-              </label>
-              <label className="security-toggle">
-                <input
-                  type="checkbox"
-                  checked={usePassphrase}
-                  onChange={(event) => {
-                    setUsePassphrase(event.target.checked);
-                    if (!event.target.checked) setPassphrase("");
-                  }}
-                />
-                <span className="toggle-box"><Check size={12} /></span>
-                <KeyRound size={16} />
-                <span>
-                  <b>{t("sec.passphrase.title")}</b>
-                  <small>{t("sec.passphrase.sub")}</small>
-                </span>
-              </label>
-              {usePassphrase && (
-                <div className="passphrase-field">
-                  <input
-                    className="passphrase-input"
-                    type="password"
-                    value={passphrase}
-                    onChange={(event) => {
-                      setPassphrase(event.target.value.slice(0, 64));
-                      setError("");
-                    }}
-                    placeholder={t("sec.passphrase.placeholder")}
-                    autoComplete="new-password"
-                    aria-invalid={
-                      passphrase.length > 0 && passphraseMissingCharacters > 0
-                    }
-                    aria-describedby="passphrase-requirement"
-                  />
-                  <small
-                    id="passphrase-requirement"
-                    className={
-                      passphrase.length > 0 && passphraseMissingCharacters > 0
-                        ? "field-hint invalid"
-                        : "field-hint"
-                    }
-                  >
-                    {passphrase.length === 0
-                      ? t("sec.passphrase.hint.empty")
-                      : passphraseMissingCharacters > 0
-                        ? t("sec.passphrase.hint.short", { n: passphraseMissingCharacters })
-                        : t("sec.passphrase.hint.ok")}
-                  </small>
+                <ChevronDown size={17} />
+              </button>
+              {securityOpen && (
+                <div className="security-options-body">
+                  <label className="security-toggle">
+                    <input
+                      type="checkbox"
+                      checked={requiresVerification}
+                      onChange={(event) => setRequiresVerification(event.target.checked)}
+                    />
+                    <span className="toggle-box"><Check size={12} /></span>
+                    <ShieldCheck size={16} />
+                    <span>
+                      <b>{t("sec.verify.title")}</b>
+                      <small>{t("sec.verify.sub")}</small>
+                    </span>
+                  </label>
+                  <label className="security-toggle">
+                    <input
+                      type="checkbox"
+                      checked={sameNetworkOnly}
+                      onChange={(event) => setSameNetworkOnly(event.target.checked)}
+                    />
+                    <span className="toggle-box"><Check size={12} /></span>
+                    <Wifi size={16} />
+                    <span>
+                      <b>{t("sec.network.title")}</b>
+                      <small>{t("sec.network.sub")}</small>
+                    </span>
+                  </label>
+                  <label className="security-toggle">
+                    <input
+                      type="checkbox"
+                      checked={usePassphrase}
+                      onChange={(event) => {
+                        setUsePassphrase(event.target.checked);
+                        if (!event.target.checked) setPassphrase("");
+                      }}
+                    />
+                    <span className="toggle-box"><Check size={12} /></span>
+                    <KeyRound size={16} />
+                    <span>
+                      <b>{t("sec.passphrase.title")}</b>
+                      <small>{t("sec.passphrase.sub")}</small>
+                    </span>
+                  </label>
+                  {usePassphrase && (
+                    <div className="passphrase-field">
+                      <input
+                        className="passphrase-input"
+                        type="password"
+                        value={passphrase}
+                        onChange={(event) => {
+                          setPassphrase(event.target.value.slice(0, 64));
+                          setError("");
+                        }}
+                        placeholder={t("sec.passphrase.placeholder")}
+                        autoComplete="new-password"
+                        aria-invalid={
+                          passphrase.length > 0 && passphraseMissingCharacters > 0
+                        }
+                        aria-describedby="passphrase-requirement"
+                      />
+                      <small
+                        id="passphrase-requirement"
+                        className={
+                          passphrase.length > 0 && passphraseMissingCharacters > 0
+                            ? "field-hint invalid"
+                            : "field-hint"
+                        }
+                      >
+                        {passphrase.length === 0
+                          ? t("sec.passphrase.hint.empty")
+                          : passphraseMissingCharacters > 0
+                            ? t("sec.passphrase.hint.short", { n: passphraseMissingCharacters })
+                            : t("sec.passphrase.hint.ok")}
+                      </small>
+                    </div>
+                  )}
+                  {sameNetworkOnly && (
+                    <p className="network-caveat">
+                      {t("sec.network.caveat")}
+                    </p>
+                  )}
                 </div>
-              )}
-              {sameNetworkOnly && (
-                <p className="network-caveat">
-                  {t("sec.network.caveat")}
-                </p>
               )}
             </div>
             <button
@@ -568,7 +593,6 @@ function UnifiedHome() {
             </span>
             <span>
               {t("how.link")}
-              <small className="how-toggle-sub">{t("how.kicker")}</small>
             </span>
           </span>
           <ChevronDown
@@ -630,20 +654,26 @@ function ReceiveEntry() {
   const { t } = useLang();
   const [code, setCode] = useState("");
   const [passphrase, setPassphrase] = useState("");
+  const [passphraseRequired, setPassphraseRequired] = useState(false);
+  const [roomPreview, setRoomPreview] = useState(null);
   const [verificationCode, setVerificationCode] = useState("");
   const [state, setState] = useState("idle");
   const [error, setError] = useState("");
   const [payload, setPayload] = useState(null);
   const [deletionConfirmed, setDeletionConfirmed] = useState(false);
+  const codeRemaining = Math.max(0, 8 - code.length);
   const join = async () => {
     if (!/^\d{8}$/.test(code)) return setError(t("recv.err.code"));
     setState("joining");
     setError("");
     try {
-      const found = await api(`/rooms/code/${code}`);
+      const found = roomPreview || await api(`/rooms/code/${code}`);
+      setRoomPreview(found);
       if (found.requiresPassphrase && !normalizePassphrase(passphrase)) {
+        setPassphraseRequired(true);
         setState("idle");
-        return setError(t("recv.err.needPassphrase"));
+        setError("");
+        return;
       }
       const pair = await createPair();
       const passphraseMaterial = found.requiresPassphrase
@@ -664,7 +694,9 @@ function ReceiveEntry() {
         found.senderPublicKey,
         passphraseMaterial?.encryptionSecret,
       );
-      setVerificationCode(session.verificationCode);
+      setVerificationCode(
+        found.requiresVerification !== false ? session.verificationCode : "",
+      );
       setState("waiting");
       for (;;) {
         const status = await api(`/rooms/${found.roomId}`);
@@ -761,27 +793,62 @@ function ReceiveEntry() {
       <h2>
         <Multiline text={t("recv.h2")} />
       </h2>
-      <input
-        className="code-input"
-        value={code}
-        onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
-        placeholder={t("recv.code.placeholder")}
-        inputMode="numeric"
-        maxLength={8}
-      />
-      <div className="receive-passphrase">
-        <KeyRound size={15} />
+      <div className={`code-field ${code.length === 8 ? "complete" : ""}`}>
         <input
-          type="password"
-          value={passphrase}
-          onChange={(event) => setPassphrase(event.target.value.slice(0, 64))}
-          placeholder={t("recv.passphrase.placeholder")}
-          autoComplete="current-password"
+          className="code-input"
+          value={code}
+          onChange={(e) => {
+            setCode(e.target.value.replace(/\D/g, "").slice(0, 8));
+            setRoomPreview(null);
+            setPassphraseRequired(false);
+            setPassphrase("");
+            setError("");
+          }}
+          placeholder={t("recv.code.placeholder")}
+          inputMode="numeric"
+          maxLength={8}
+          aria-describedby="receive-code-progress"
+          aria-invalid={code.length > 0 && code.length < 8}
         />
+        <div
+          id="receive-code-progress"
+          className="code-progress"
+          role="status"
+          aria-live="polite"
+        >
+          <span>
+            {code.length === 0
+              ? t("recv.code.hint.empty")
+              : codeRemaining > 0
+                ? t("recv.code.hint.remaining", { n: codeRemaining })
+                : t("recv.code.hint.ready")}
+          </span>
+          <strong>{code.length}/8</strong>
+        </div>
       </div>
+      {passphraseRequired && (
+        <div className="receive-passphrase">
+          <KeyRound size={15} />
+          <input
+            type="password"
+            value={passphrase}
+            onChange={(event) => {
+              setPassphrase(event.target.value.slice(0, 64));
+              setError("");
+            }}
+            placeholder={t("recv.passphrase.placeholder")}
+            autoComplete="current-password"
+            autoFocus
+          />
+        </div>
+      )}
       <button
         className="primary-btn"
-        disabled={state !== "idle" || code.length !== 8}
+        disabled={
+          state !== "idle" ||
+          code.length !== 8 ||
+          (passphraseRequired && !normalizePassphrase(passphrase))
+        }
         onClick={join}
       >
         {state === "joining" ? (
@@ -794,7 +861,14 @@ function ReceiveEntry() {
           </>
         ) : (
           <>
-            {t("recv.btn.start")} <ArrowUpRight size={17} />
+            {passphraseRequired
+              ? normalizePassphrase(passphrase)
+                ? t("recv.btn.withPassphrase")
+                : t("recv.btn.enterPassphrase")
+              : code.length > 0 && codeRemaining > 0
+                ? t("recv.btn.remaining", { n: codeRemaining })
+                : t("recv.btn.start")}{" "}
+            {codeRemaining === 0 && <ArrowUpRight size={17} />}
           </>
         )}
       </button>
@@ -914,16 +988,20 @@ function ReadyPage({ result, onReset, onVerify, stage }) {
                 {result.code.slice(0, 4)} <span>{result.code.slice(4)}</span>
               </div>
               <p className="pair-hint">{t("ready.pair.hint")}</p>
-              {(result.sameNetworkOnly || result.requiresPassphrase) && (
-                <div className="restriction-badges">
-                  {result.sameNetworkOnly && (
-                    <span><Wifi size={12} /> {t("ready.badge.network")}</span>
-                  )}
-                  {result.requiresPassphrase && (
-                    <span><KeyRound size={12} /> {t("ready.badge.passphrase")}</span>
-                  )}
-                </div>
-              )}
+              <div className="restriction-badges">
+                <span>
+                  <ShieldCheck size={12} />
+                  {result.requiresVerification !== false
+                    ? t("ready.badge.confirm")
+                    : t("ready.badge.auto")}
+                </span>
+                {result.sameNetworkOnly && (
+                  <span><Wifi size={12} /> {t("ready.badge.network")}</span>
+                )}
+                {result.requiresPassphrase && (
+                  <span><KeyRound size={12} /> {t("ready.badge.passphrase")}</span>
+                )}
+              </div>
             </>
           )}
           {!ended && stage === "verify" && result.verificationCode && (
@@ -945,13 +1023,6 @@ function ReadyPage({ result, onReset, onVerify, stage }) {
               </strong>
             </div>
           )}
-          <div className="privacy-callout">
-            <ShieldCheck size={16} />
-            <span>
-              <b>{t("ready.privacy.title")}</b>
-              <small>{t("ready.privacy.sub")}</small>
-            </span>
-          </div>
           <div className="ready-actions">
             <button className="secondary-btn" onClick={onReset}>
               <RotateCcw size={15} /> {t("ready.btn.again")}
@@ -1001,4 +1072,8 @@ function ReadyPage({ result, onReset, onVerify, stage }) {
   );
 }
 
-createRoot(document.getElementById("root")).render(<App />);
+const rootElement = document.getElementById("root");
+const root = import.meta.hot
+  ? (globalThis.__instantflowRoot ||= createRoot(rootElement))
+  : createRoot(rootElement);
+root.render(<App />);
