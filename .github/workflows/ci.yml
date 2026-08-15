@@ -82,6 +82,6 @@ jobs:
       - name: Audit production dependencies (moderate severity)
         run: npm audit --omit=dev --audit-level=moderate --registry=https://registry.npmjs.org
       - name: Scan for secrets with gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
